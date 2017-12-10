@@ -14,6 +14,10 @@ import java.util.Objects;
 public class Palabra {
     String word;
 
+    public Palabra(String word) {
+        this.word = word;
+    }
+
     public String getWord() {
         return word;
     }
