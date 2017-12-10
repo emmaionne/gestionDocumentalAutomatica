@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <head>
+        <h:outputStylesheet name="https://use.fontawesome.com/4f92878ce5.js"/>
+        <h:outputStylesheet name="./css/bootstrap.css"/>
+    </head>
+
+    <body>
+
+        <ui:composition >
+            <h:form>
+                <p:menu class="ui-panel-titlebar ui-helper-clearfix ui-corner-all">                    
+                    <p:submenu label = "Documentos">
+                        <p:menuitem value="Lista de documentos"
+                                    icon="ui-icon-document-b" 
+                                    action="#{publicacionController.redirigirPublicacionesEst()}" ajax="false"/>
+                        
+                        <p:menuitem value="Registrar documento"                                     
+                                    icon="ui-icon-document-b" 
+                                    action="#{publicacionController.redirigirARegistrar(userLoginView.username)}" ajax="false"/>
+                        <p:menuitem value="Reportes"                                     
+                                    icon="ui-icon-document-b"
+                                    action="#{publicacionController.redirigirAReportes()}" ajax="false">          
+                        </p:menuitem>
+                    </p:submenu>                    
+                </p:menu>
+            </h:form>  
+        </ui:composition>
+
+    </body>
+</html>

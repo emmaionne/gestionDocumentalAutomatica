@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="TipoDocumentoViewDlg" widgetVar="TipoDocumentoViewDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundlePracticaDocente.ViewTipoDocumentoTitle}">
+            <h:form id="TipoDocumentoViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{tipoDocumentoController.selected != null}">
+                        <h:outputText value="#{bundlePracticaDocente.ViewTipoDocumentoLabel_identificador}"/>
+                        <h:outputText value="#{tipoDocumentoController.selected.identificador}" title="#{bundlePracticaDocente.ViewTipoDocumentoTitle_identificador}"/>
+                        <h:outputText value="#{bundlePracticaDocente.ViewTipoDocumentoLabel_nombre}"/>
+                        <h:outputText value="#{tipoDocumentoController.selected.nombre}" title="#{bundlePracticaDocente.ViewTipoDocumentoTitle_nombre}"/>
+                        <h:outputText value="#{bundlePracticaDocente.ViewTipoDocumentoLabel_creditos}"/>
+                        <h:outputText value="#{tipoDocumentoController.selected.creditos}" title="#{bundlePracticaDocente.ViewTipoDocumentoTitle_creditos}"/>
+                        <h:outputText value="#{bundlePracticaDocente.ViewTipoDocumentoLabel_maxCreditos}"/>
+                        <h:outputText value="#{tipoDocumentoController.selected.maxCreditos}" title="#{bundlePracticaDocente.ViewTipoDocumentoTitle_maxCreditos}"/>
+                        <h:outputText value="#{bundlePracticaDocente.ViewTipoDocumentoLabel_minCreditos}"/>
+                        <h:outputText value="#{tipoDocumentoController.selected.minCreditos}" title="#{bundlePracticaDocente.ViewTipoDocumentoTitle_minCreditos}"/>
+                        <h:outputText value="#{bundlePracticaDocente.ViewTipoDocumentoLabel_correquisitos}"/>
+                        <h:outputText value="#{tipoDocumentoController.selected.correquisitos}" title="#{bundlePracticaDocente.ViewTipoDocumentoTitle_correquisitos}"/>
+                    </p:panelGrid>
+                    <p:commandButton value="#{bundlePracticaDocente.Close}" onclick="TipoDocumentoViewDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

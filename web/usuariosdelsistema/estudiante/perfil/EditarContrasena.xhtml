@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>Datos Personales</title>
+    </h:head>
+
+    <ui:composition template="../../../plantillas/Estudiante.xhtml">
+        <ui:define name="content">
+            
+            <div class="ui-messages-info ">
+                <span class="ui-messages-info-detail">
+                    <b>Datos Personales</b>
+                </span>
+            </div>                                                            
+            
+            
+                <p:panel header="Editar contraseña">
+
+                    <p:outputLabel value="#{bundleUsuarios.DescripcionVistaCambioContrasena}"/>
+                    <br></br><br></br>
+                    <h:panelGrid columns="1" cellpadding="10" border="1" >
+                        <p:outputPanel>
+                            <h3><p:outputLabel value="#{bundleUsuarios.TituloRecomendacionesContrasena}"/></h3>
+                            <ul>
+                                <li><p:outputLabel value="#{bundleUsuarios.RecomendacionContrasena1}"/></li>
+                                <li><p:outputLabel value="#{bundleUsuarios.RecomendacionContrasena2}"/></li>
+                                <li><p:outputLabel value="#{bundleUsuarios.RecomendacionContrasena3}"/></li>
+                                <li><p:outputLabel value="#{bundleUsuarios.RecomendacionContrasena4}"/></li>
+                            </ul>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                    <br></br>
+                    
+                    <h:form>
+                        
+                        <p:panel id="panelClaves" >
+                            <p:messages id="messages" showDetail="true"  autoUpdate="true" closable="true"/>
+                            <h:panelGrid  columns="3"  cellpadding="5">
+
+                                <p:outputLabel value="#{bundleUsuarios.CurrentPassword}" style="font-weight: bold;">:</p:outputLabel>
+                                <p:password id="msgActual" value="#{usuarioController.contrasenas.contrasenaActual}">
+                                    <f:validator validatorId="validarContrasena" />
+                                    <p:ajax update="out1" event="blur" />
+                                </p:password>
+                                <p:message for="msgActual" id="out1"/>
+
+                                <p:outputLabel value="#{bundleUsuarios.NewPassword}" style="font-weight: bold;">:</p:outputLabel>
+                                <p:password id="msgNuevo" value="#{usuarioController.contrasenas.nuevaContrasena}">
+                                    <f:validator validatorId="validarContrasena" />
+                                    <p:ajax update="out2" event="blur" />
+                                </p:password>
+                                <p:message for="msgNuevo" id="out2" />
+
+                                <p:outputLabel value="#{bundleUsuarios.ConfirmNewPassword}" style="font-weight: bold;">:</p:outputLabel>
+                                <p:password id="msgNuevoR" value="#{usuarioController.contrasenas.nuevaContrasenaR}">
+                                    <f:validator  validatorId="validarContrasena" />
+                                    <p:ajax update="out3" event="blur" />
+                                </p:password>
+                                <p:message for="msgNuevoR" id="out3"/>
+
+                            </h:panelGrid>
+                            <p:commandButton value="Cambiar contrasena" actionListener="#{usuarioController.validarCampos(verEstudianteController.usuario)}" action="#{usuarioController.cambiarContrasena(verEstudianteController.usuario)}"/>  
+                            <p:commandButton  value="Cancelar" action="#{publicacionController.redirigirPublicacionesEst()}"/> 
+                        </p:panel>
+                    </h:form>
+
+                    <br></br>
+                    
+
+                </p:panel>
+            
+        </ui:define>              
+    </ui:composition>
+</html>
+

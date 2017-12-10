@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <link rel="shortcut icon" href="#{resource['images/favicon.ico']}" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="css/default.css"/>
+        <h:outputStylesheet name="css/cssLayout.css"/>
+        
+
+        <title>DCE</title>
+        <h:outputScript library="js" name="jquery.flexibleArea.js"></h:outputScript>
+    </h:head>
+
+    <h:body> 
+        
+        <header class="interno">
+		<div id="logoU"></div>
+		<div class="separador"></div>
+		<p id="desc">Doctorado en Ciencias de la Electrónica</p>
+		<div class="logoSimca"></div>
+		<div id="banderaHeader"></div>
+		<div class="clear"></div>
+	</header>
+       
+
+        <p:menubar style="margin-left: 20px; margin-right: 20px; margin-top: 7px; margin-bottom: 10px;">                           
+            <f:facet name="options">                                 
+                <h:form style="width: auto" >
+                    <p:commandButton  icon="ui-icon-power" value="Cerrar Sesión" actionListener="#{userLoginView.salir}" style="font-size: 16px;"/>
+                    <p:commandButton id="opcionesusuario2" icon="ui-icon-triangle-1-s" title="Opciones de usuario" />
+                    <p:menu overlay="true" trigger="opcionesusuario2" my="right top" at="right bottom" >                           
+                        <p:separator/>
+                        <p:menuitem value="Mi Perfil" action="#{verEstudianteController.redirigirVerMisDatos(userLoginView.username)}" icon="ui-icon-person"/>
+                        <p:menuitem value="Cambiar Contraseña" action="#{verEstudianteController.irEditarContrasena(userLoginView.username)}" icon="ui-icon-key"/> 
+                        <p:separator/>
+                        <p:menuitem value="Cerrar Sesión" action="#{userLoginView.salir}" icon="ui-icon-power"/> 
+                        <p:separator/>
+                    </p:menu>
+                </h:form>
+            </f:facet>
+        </p:menubar>
+
+        <div>                        
+            <div id="menu_coordinador" style="float:left; margin-left: 20px; ">
+                <div class="ui-messages-info ui-corner-all">
+                    <span class="ui-messages-info-detail"><b>Menú estudiante</b></span>
+                </div>
+                <ui:insert name="left" >
+                    <ui:include src="../estudiante/menu.xhtml"></ui:include>
+                </ui:insert>
+            </div>
+            
+            <div id="contenido_coordinador" style=" width: 82%; float:left ; margin-left: 16px;">                                
+                <!--efecto de carga-->
+                <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                    <div id="efectoCarga"></div>
+                </p:dialog>
+                
+                <!--contenido principal-->                
+                <ui:insert name="content">Contenido documentos</ui:insert>                
+            </div>
+           
+        </div>
+        <footer class="interno">
+            <div id="banderaFooter"></div>                     
+            <p style="font-size: 15px; font-family: sans-serif" align="center">Facultad de Ingeniería Electrónica y Telecomunicaciones <br/>                
+                <a id="a" href="http://www.unicauca.edu.co" style="color: blue">Universidad del Cauca</a>                
+            </p>
+        </footer>
+    </h:body>
+    
+    <script>
+
+        PrimeFaces.locales['es'] = {
+                closeText: 'Cerrar',
+                prevText: 'Anterior',
+                nextText: 'Siguiente',
+                monthNames: ['Enero','Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+                dayNames: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
+                dayNamesShort: ['Dom','Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                dayNamesMin: ['D','L','M','M','J','V','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Sólo hora',
+                timeText: 'Tiempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Fecha actual',
+                ampm: false,
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+                allDayText : 'Todo el día'
+        };
+        
+        </script>
+    
+</html>

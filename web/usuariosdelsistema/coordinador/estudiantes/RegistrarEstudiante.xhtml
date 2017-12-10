@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title>Registrar estudiante</title>
+    </h:head>
+
+    <ui:composition template="./../../../plantillas/Coordinador.xhtml">
+        <ui:define name="content"> 
+            <div class="ui-messages-info ">
+                <span class="ui-messages-info-detail">
+                    <b>Registrar estudiante</b>
+                </span>
+            </div>             
+
+            <h:form id="form_registrar">
+                <p:tab  title="Datos personales" titleStyleClass="title" >
+                    <p:panel header="Información personal">
+                        <div style = "float: right;">
+                            <p:outputLabel style="font-weight:bold; " value="Campos obligatorios"/>
+                            <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="* " />
+                        </div>
+
+                        <h:panelGrid columns="3"  cellpadding="5">
+                            <h:panelGroup>
+                                <p:outputLabel value="Nombres:" style="font-weight:bold;"/>
+                                <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />
+                            </h:panelGroup>
+                            <p:inputText class="form-control" id="valNombre" placeholder="Nombre estudiante" value="#{estudianteController.actual.estNombre}">
+                                <f:validator validatorId="validadorNombreEstudiante"/>
+                                <p:ajax event="blur" update="msjValNombre"/>
+                            </p:inputText>
+                            <p:message for="valNombre" id="msjValNombre" styleClass="addEspacio"/>
+
+                            <h:panelGroup>
+                                <p:outputLabel value="Apellidos:" styleClass="addEspacio" style="font-weight:bold;"/>
+                                <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />
+                            </h:panelGroup>
+                            <p:inputText class="form-control" id="valApellido" placeholder="Apellido estudiante" value="#{estudianteController.actual.estApellido}">
+                                <f:validator validatorId="validadorApellidoEstudiante"/>
+                                <p:ajax event="blur" update="msjValApellido"/>
+                            </p:inputText>
+                            <p:message for="valApellido" id="msjValApellido" styleClass="addEspacio" /> 
+
+                            <h:panelGroup>
+                                <p:outputLabel value="Código:" styleClass="addEspacio" style="font-weight:bold;"/>
+                                <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />
+                            </h:panelGroup>
+                            <p:inputText class="form-control" id="valCodigo" placeholder="70_123123123" value="#{estudianteController.actual.estCodigo}">
+                                <f:validator validatorId="validadorCodigoEstudiante"/>
+                                <p:ajax event="blur" update="msjValCodigo"/>
+                            </p:inputText>
+                            <p:message for="valCodigo" id="msjValCodigo" styleClass="addEspacio"/>
+
+                            <h:panelGroup>
+                                <p:outputLabel value="Correo electrónico:" style="font-weight:bold;"/>
+                                <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />                                
+                            </h:panelGroup>
+                            <p:inputText class="form-control" id="valCorreo" placeholder="ejemplo@unicauca.edu.co" value="#{estudianteController.actual.estCorreo}">
+                                <f:validator validatorId="validadorCorreo"/>                            
+                                <f:validator validatorId="ValidarCorreoEstudianteNoExistente"/>                            
+                                <p:ajax event="blur" update="msjValCorreo"/>
+                            </p:inputText>
+                            <p:message for="valCorreo" id="msjValCorreo" styleClass="addEspacio"/>
+
+                            <h:panelGroup>
+                                <p:outputLabel value="Cohorte:" style="font-weight:bold;"/>
+                                <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />  
+                            </h:panelGroup>
+                            <p:inputText class="form-control" id="valCohorte" placeholder="2000" value="#{estudianteController.actual.estCohorte}">
+                                <f:validator validatorId="validadorCohorteEstudiante"/>
+                                <p:ajax event="blur" update="msjValCohorte"/>
+                            </p:inputText>
+                            <p:message for="valCohorte" id="msjValCohorte" styleClass="addEspacio"/>  
+                            
+                            <h:panelGroup>
+                                <p:outputLabel value="Nombre tutor:" style="font-weight:bold;"/>
+                                <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />
+                            </h:panelGroup>
+                            <p:inputText class="form-control" id="valNombreTutor" placeholder="Nombre tutor" value="#{estudianteController.actual.estTutor}">
+                                <f:validator validatorId="validadorNombreTutorEstudiante"/>                            
+                                <p:ajax event="blur" update="msjValNombreTutor"/>
+                            </p:inputText>
+                            <p:message for="valNombreTutor" id="msjValNombreTutor" styleClass="addEspacio" />
+
+                            <h:panelGroup>
+                                <p:outputLabel value="Semestre:" style="font-weight:bold;"/>
+                                <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />
+                            </h:panelGroup>
+                            <p:selectOneMenu id="valSemestre" value="#{estudianteController.actual.estSemestre}" style="width: 100%">
+                                <f:selectItem itemLabel="1" itemValue="1"/>
+                                <f:selectItem itemLabel="2" itemValue="2"/>
+                            </p:selectOneMenu>
+                            
+                        </h:panelGrid>
+                        
+                        <br/>
+                        <h:commandButton value="Registrar" action="#{estudianteController.agregar()}" class="botonVerPractica " />
+                        <p:commandButton onclick="PF('dlg2').show();"  value="Cancelar" class="btn btn-success btn_listaEstudiantes" style="font-size: 13px;"/>
+
+                        <p:dialog header="Advertencia" widgetVar="dlg2" modal="true" resizable="false">
+                            <h:form style="font-size: 10px;">
+                                <br/>
+                                <h:outputText value="¿Esta seguro que cancelar el registro del estudiante?" />
+                                <br/><br/>
+                                <p:commandButton onclick="PF('dlg2').hide();" value="No" class="btn btn-success btn_listaEstudiantes" style="font-size: 13px;"/>
+                                <h:commandButton action="#{estudianteController.redirigirAlistar()}" value="Si" class="botonVerPractica" style="font-size: 13px;" immediate="true"/>
+                            </h:form>
+                        </p:dialog>
+                        
+                    </p:panel>
+                </p:tab>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
