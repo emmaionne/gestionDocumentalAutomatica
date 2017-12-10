@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="ResolucionViewDlg" widgetVar="ResolucionViewDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundleResolucion.ViewResolucionTitle}">
+            <h:form id="ResolucionViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{resolucionController.selected != null}">
+                        <h:outputText value="#{bundleResolucion.ViewResolucionLabel_pubIdentificador}"/>
+                        <h:outputText value="#{resolucionController.selected.pubIdentificador}" title="#{bundleResolucion.ViewResolucionTitle_pubIdentificador}"/>
+                        <h:outputText value="#{bundleResolucion.ViewResolucionLabel_resNumero}"/>
+                        <h:outputText value="#{resolucionController.selected.resNumero}" title="#{bundleResolucion.ViewResolucionTitle_resNumero}"/>
+                        <h:outputText value="#{bundleResolucion.ViewResolucionLabel_resDescripcion}"/>
+                        <h:outputText value="#{resolucionController.selected.resDescripcion}" title="#{bundleResolucion.ViewResolucionTitle_resDescripcion}"/>
+                        <h:outputText value="#{bundleResolucion.ViewResolucionLabel_publicacion}"/>
+                        <h:outputText value="#{resolucionController.selected.publicacion}" title="#{bundleResolucion.ViewResolucionTitle_publicacion}"/>
+                    </p:panelGrid>
+                    <p:commandButton value="#{bundleResolucion.Close}" onclick="ResolucionViewDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

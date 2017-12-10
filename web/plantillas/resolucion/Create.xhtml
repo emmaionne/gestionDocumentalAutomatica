@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="ResolucionCreateDlg" widgetVar="ResolucionCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundleResolucion.CreateResolucionTitle}">
+            <h:form id="ResolucionCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{resolucionController.selected != null}">
+                        <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_pubIdentificador}" for="pubIdentificador" />
+                        <p:inputText id="pubIdentificador" value="#{resolucionController.selected.pubIdentificador}" title="#{bundleResolucion.CreateResolucionTitle_pubIdentificador}" required="true" requiredMessage="#{bundleResolucion.CreateResolucionRequiredMessage_pubIdentificador}"/>
+                        <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_resNumero}" for="resNumero" />
+                        <p:inputText id="resNumero" value="#{resolucionController.selected.resNumero}" title="#{bundleResolucion.CreateResolucionTitle_resNumero}" />
+                        <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_resDescripcion}" for="resDescripcion" />
+                        <p:inputText id="resDescripcion" value="#{resolucionController.selected.resDescripcion}" title="#{bundleResolucion.CreateResolucionTitle_resDescripcion}" />
+                        <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_publicacion}" for="publicacion" />
+                        <p:selectOneMenu id="publicacion" value="#{resolucionController.selected.publicacion}" required="true" requiredMessage="#{bundleResolucion.EditResolucionRequiredMessage_publicacion}">
+                            <f:selectItems value="#{publicacionController.itemsAvailableSelectOne}"
+                                           var="publicacionItem"
+                                           itemValue="#{publicacionItem}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{resolucionController.create}" value="#{bundleResolucion.Save}" update="display,:ResolucionListForm:datalist,:growl" oncomplete="handleSubmit(args,'ResolucionCreateDialog');"/>
+                    <p:commandButton value="#{bundleResolucion.Cancel}" onclick="ResolucionCreateDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

@@ -66,6 +66,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -137,6 +138,13 @@ import org.primefaces.model.UploadedFile;
 })
 
 public class Publicacion implements Serializable {
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
+    private Acta acta;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
+    private Resolucion resolucion;
+    @OneToMany(mappedBy = "pubIdentificador")
+    private List<PalabraClave> palabraClaveList;
 
     //Créditos de una publicación
     @Column(name = "pub_creditos")
@@ -435,7 +443,39 @@ public class Publicacion implements Serializable {
         
         
     }
+    
+    public void AgregarActa(UploadedFile Archivo) throws IOException
+    {
+        MetodosPDF mpdf = new MetodosPDF();
+        String codigoActa = "Acta";
+        String codigoFirma = mpdf.codigoFirma(codigoActa);
+        codigoFirma = codigoFirma.trim();
+        
+        PropiedadesOS os = new PropiedadesOS();
+        String nombre = "Acta-" + codigoFirma;
+        String realPath = FacesContext.getCurrentInstance().getExternalContext().getRealPath(os.getSeparator());
+        String destPD = realPath + "WEB-INF"+ os.getSeparator() +"temp" + os.getSeparator() + nombre + ".pdf";
+        Date date = new Date();
+        DateFormat datehourFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String estampaTiempo = "" + datehourFormat.format(date);
+        this.setPubFechaRegistro(date);
+        
+        ArrayList<tipoPDF_cargar> subidaArchivos = new ArrayList<>();
+         if (!Archivo.getFileName().equalsIgnoreCase("")) {
+            tipoPDF_cargar acta = new tipoPDF_cargar();
+            acta.setNombreArchivo(nombre);
+            acta.setRutaArchivo(destPD);
+            acta.setTipoPDF("Acta");
+            acta.setArchivoIS(Archivo.getInputstream());
+            subidaArchivos.add(acta);
+        }
+         System.out.println(subidaArchivos.size());
+         CrearPDF_MetadataPD_acta(subidaArchivos, estampaTiempo);
+         String hash = mpdf.obtenerHash(destPD);
+         SubirOpenKMDoc(subidaArchivos, estampaTiempo, codigoFirma, hash);
 
+    }
+    
     /***
      * Metodo para subir los archivos al gestor de documentos(OpenKm). Se crea 
      * la carpeta en el gestor, se crean los documentos y se fijan los metadatos
@@ -456,8 +496,8 @@ public class Publicacion implements Serializable {
             /* codigoFirma - en este caso corresponde al nombre de la carpeta que contendra
                 el articulo y su tabla de contenido en formato PDFA
                 Ruta del folder a crear en el Gestor Openkm*/
-            // rutaFolderCrear = "/okm:root/Doctorado_Electronica/" + codigoFirma;
-            rutaFolderCrear = "/okm:root/Doctorado_Electronica/" + this.pubEstIdentificador.getEstUsuario();
+            // rutaFolderCrear = "/okm:root/Maestria_Automatica/" + codigoFirma;
+            rutaFolderCrear = "/okm:root/Maestria_Automatica/" + this.pubEstIdentificador.getEstUsuario();
             this.setPubDiropkm(codigoFirma);
             try {
                 /* Se valida si el forder a crear existe o no*/
@@ -473,7 +513,7 @@ public class Publicacion implements Serializable {
                 ws.createFolder(fld);
             }
 
-            rutaFolderCrear = "/okm:root/Doctorado_Electronica/" + this.pubEstIdentificador.getEstUsuario() + "/" + codigoFirma;
+            rutaFolderCrear = "/okm:root/Maestria_Automatica/" + this.pubEstIdentificador.getEstUsuario() + "/" + codigoFirma;
             try {
                 /* Se valida si el forder a crear existe o no*/
                 ws.isValidFolder(rutaFolderCrear);
@@ -791,7 +831,69 @@ public class Publicacion implements Serializable {
         }
         return archivosSubidos;
     }
+    
+    /**
+     * Subir Actas
+     * @param subidaArchivos
+     * @param estampaTiempo
+     * @param codigoFirma
+     * @param hash 
+     */
+    public void SubirOpenKMDoc(ArrayList<tipoPDF_cargar> subidaArchivos, String estampaTiempo, String codigoFirma, String hash)
+    {        
+        OKMWebservices ws = ConeccionOpenKM.getInstance().getWs(); 
+        try{
+            boolean crearFolder;
+            String rutaFolderCrear;
+            String annio;
+            /* codigoFirma - en este caso corresponde al nombre de la carpeta que contendra
+                el articulo y su tabla de contenido en formato PDFA
+                Ruta del folder a crear en el Gestor Openkm*/
+            // rutaFolderCrear = "/okm:root/Maestria_Automatica/" + codigoFirma;
+            
+            // La ruta para guardar actas es /okm:root/Maestria_Automatica/Actas/Año
+            Calendar c1 = Calendar.getInstance();
+            annio = Integer.toString(c1.get(Calendar.YEAR));
+            rutaFolderCrear = "/okm:root/Maestria_Automatica/Documentos_Maestria/Actas_" + annio;
+            this.setPubHash(hash);
+            this.setPubDiropkm(codigoFirma);
+            try {
+                /* Se valida si el forder a crear existe o no*/
+                ws.isValidFolder(rutaFolderCrear);
+                crearFolder = false;
+            } catch (PathNotFoundException | AccessDeniedException | RepositoryException | DatabaseException | UnknowException | WebserviceException e) {
+                crearFolder = true;
+            }
+            if (crearFolder == true) {
+                /* Si no existe el folder, se crea con la ruta(rutaFolderCrear)*/
+                Folder fld = new Folder();
+                fld.setPath(rutaFolderCrear);
+                ws.createFolder(fld);
+            }
+            for (int i = 0; i < subidaArchivos.size(); i++) {
+                    InputStream is = new FileInputStream("" + subidaArchivos.get(i).getRutaArchivo());
+                    com.openkm.sdk4j.bean.Document doc = new com.openkm.sdk4j.bean.Document();
+                    doc.setPath(rutaFolderCrear + "/" + subidaArchivos.get(i).getNombreArchivo() + ".pdf");
+                    ws.createDocument(doc, is);
 
+                    IOUtils.closeQuietly(is);
+                    List<FormElement> fElements = ws.getPropertyGroupProperties("" + rutaFolderCrear + "/" + subidaArchivos.get(i).getNombreArchivo() + ".pdf", "okg:acta");
+                    for (FormElement fElement : fElements) {
+                        if (fElement.getName().equals("okp:acta.identPublicacion")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + this.pubIdentificador);
+                        }
+                    }
+                    ws.setPropertyGroupProperties("" + rutaFolderCrear + "/" + subidaArchivos.get(i).getNombreArchivo() + ".pdf", "okg:acta", fElements);
+                    
+             }
+            
+        }catch (AccessDeniedException | AutomationException | DatabaseException | ExtensionException | FileSizeExceededException | ItemExistsException | LockException | NoSuchGroupException | NoSuchPropertyException | ParseException | PathNotFoundException | RepositoryException | UnknowException | UnsupportedMimeTypeException | UserQuotaExceededException | VirusDetectedException | WebserviceException | IOException e) {
+            System.out.println("error en metodo SubirOpenKMDoc de publicacion.java. error: " + e.getMessage());
+                    
+        }
+            
+    }
     /**
      * Crea los archivos pdf con los metadatos que son subidos al gestor openKm.
      * @param subidaArchivos
@@ -967,6 +1069,53 @@ public class Publicacion implements Serializable {
         document.close();
     }
     
+    /**
+     * Metodo para crear los metadatos de Acta
+     * @param subidaArchivos
+     * @param estampaTiempo 
+     */
+    private void CrearPDF_MetadataPD_acta(ArrayList<tipoPDF_cargar> subidaArchivos, String estampaTiempo)
+    {           
+        for (int s = 0; s < subidaArchivos.size(); s++) {
+            Document document = new Document();
+            PdfReader reader;         
+            try
+            {
+                PdfAWriter writer = PdfAWriter.getInstance(document, new FileOutputStream(
+                        subidaArchivos.get(s).getRutaArchivo()), PdfAConformanceLevel.PDF_A_1B);
+                writer.setTagged();               
+
+                //Archivo arch = (Archivo) archivoCollection.toArray()[s];
+                                                        
+                document.addHeader("Identificador Publicacion", "" + this.pubIdentificador);
+                //document.addHeader("Identificador Archivo", "" + arch.getArcIdentificador());
+                //document.addHeader("tipoPDF_cargar", "" + subidaArchivos.get(s).getTipoPDF());
+                document.addHeader("Estampa Tiempo", "" + estampaTiempo);
+                
+                document.addAuthor("");
+                document.addCreator("");
+                writer.setTagged();
+                writer.createXmpMetadata();
+                writer.setCompressionLevel(9);
+                document.open();
+                PdfContentByte cb = writer.getDirectContent();
+                reader = new PdfReader(subidaArchivos.get(s).getArchivoIS());
+                PdfImportedPage page;
+                int pageCount = reader.getNumberOfPages();
+                for (int i = 0; i < pageCount; i++) {
+                    document.newPage();
+                    page = writer.getImportedPage(reader, i + 1);
+                    cb.addTemplate(page, 0, 0);
+                } 
+                document.close();
+            }catch(DocumentException | IOException de){
+                System.err.println("error en metodo CrearPDFA_MetadataPD() de clase publicacion.java para acta");
+                System.out.println(de.getMessage());
+            }       
+        }
+        
+    }    
+    
     /***
      * Elimina los documentos subidos al gestor de documentos OpenKM.
      * Se obtiene una instancia de openKm con la cual buscamos la carpeta donde
@@ -979,7 +1128,7 @@ public class Publicacion implements Serializable {
     public boolean eliminarDocOpenkm(){
         
         boolean eliminado = false;
-        String rutaFolder="/okm:root/Doctorado_Electronica/" + this.pubEstIdentificador.getEstUsuario() + "/" + this.pubDiropkm;
+        String rutaFolder="/okm:root/Maestria_Automatica/" + this.pubEstIdentificador.getEstUsuario() + "/" + this.pubDiropkm;
         Folder folder = new Folder();
         folder.setPath(rutaFolder);
         OKMWebservices ws = ConeccionOpenKM.getInstance().getWs(); 
@@ -1006,8 +1155,8 @@ public class Publicacion implements Serializable {
             /* codigoFirma - en este caso corresponde al nombre de la carpeta que contendra
                 el articulo y su tabla de contenido en formato PDFA
                 Ruta del folder a crear en el Gestor Openkm*/
-            // rutaFolderCrear = "/okm:root/Doctorado_Electronica/" + codigoFirma;
-            rutaFolderCrear = "/okm:root/Doctorado_Electronica/" + this.pubEstIdentificador.getEstUsuario();
+            // rutaFolderCrear = "/okm:root/Maestria_Automatica/" + codigoFirma;
+            rutaFolderCrear = "/okm:root/Maestria_Automatica/" + this.pubEstIdentificador.getEstUsuario();
             this.setPubHash(hash);
             this.setPubDiropkm(codigoFirma);            
             try {
@@ -1024,7 +1173,7 @@ public class Publicacion implements Serializable {
                 ws.createFolder(fld);
             }
 
-            rutaFolderCrear = "/okm:root/Doctorado_Electronica/" + this.pubEstIdentificador.getEstUsuario() + "/" + codigoFirma;
+            rutaFolderCrear = "/okm:root/Maestria_Automatica/" + this.pubEstIdentificador.getEstUsuario() + "/" + codigoFirma;
             try {
                 /* Se valida si el forder a crear existe o no*/
                 ws.isValidFolder(rutaFolderCrear);
@@ -1435,6 +1584,31 @@ public class Publicacion implements Serializable {
     @Override
     public String toString() {
         return "co.unicauca.proyectobase.entidades.Publicacion[ pubIdentificador=" + pubIdentificador + " ]";
+    }
+
+    public Acta getActa() {
+        return acta;
+    }
+
+    public void setActa(Acta acta) {
+        this.acta = acta;
+    }
+
+    public Resolucion getResolucion() {
+        return resolucion;
+    }
+
+    public void setResolucion(Resolucion resolucion) {
+        this.resolucion = resolucion;
+    }
+
+    @XmlTransient
+    public List<PalabraClave> getPalabraClaveList() {
+        return palabraClaveList;
+    }
+
+    public void setPalabraClaveList(List<PalabraClave> palabraClaveList) {
+        this.palabraClaveList = palabraClaveList;
     }
 
 }

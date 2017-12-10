@@ -28,5 +28,17 @@
             <base-name>/BundlePracticaDocente</base-name>
             <var>bundlePracticaDocente</var>
         </resource-bundle>
+        <resource-bundle>
+            <base-name>/BundleActa</base-name>
+            <var>bundleActa</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>/BundlePalabraClave</base-name>
+            <var>bundlePalabraClave</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>/BundleResolucion</base-name>
+            <var>bundleResolucion</var>
+        </resource-bundle>
     </application>
 </faces-config>

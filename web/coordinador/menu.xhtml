@@ -27,7 +27,7 @@
                                     action="#{estudianteController.redirigirARegistrar()}" ajax="false"
                                     />
                     </p:submenu>
-                    <p:submenu label = "Documentos">
+                    <p:submenu label = "Documentos Estudiantes">
                         <p:menuitem value="Todos"                                     
                                     icon="ui-icon-document-b" 
                                     action="#{publicacionController.redirigirAlistar()}" ajax="false"/>
@@ -66,6 +66,13 @@
                                     action="#{publicacionController.redirigirGraficaPubVis()}" ajax="false">          
                         </p:menuitem>
                        
+                    </p:submenu>
+                    
+                    <p:submenu label = "Documentos Maestria">
+                        <p:menuitem value="Registrar Documento"                                     
+                                    icon="ui-icon-document-b"
+                                    action="#{actaController.redirigirARegistrarCoor()}" ajax="false">          
+                        </p:menuitem>
                     </p:submenu>
                 </p:menu>
             </h:form>  

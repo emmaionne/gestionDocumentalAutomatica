@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="ActaEditDlg" widgetVar="ActaEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundleActa.EditActaTitle}">
+            <h:form id="ActaEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{actaController.selected != null}">
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_actIdentificador}" for="actIdentificador" />
+                        <p:inputText id="actIdentificador" value="#{actaController.selected.actIdentificador}" title="#{bundleActa.EditActaTitle_actIdentificador}" required="true" requiredMessage="#{bundleActa.EditActaRequiredMessage_actIdentificador}"/>
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_actNoActa}" for="actNoActa" />
+                        <p:inputText id="actNoActa" value="#{actaController.selected.actNoActa}" title="#{bundleActa.EditActaTitle_actNoActa}" required="true" requiredMessage="#{bundleActa.EditActaRequiredMessage_actNoActa}"/>
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_actDescripcion}" for="actDescripcion" />
+                        <p:inputText id="actDescripcion" value="#{actaController.selected.actDescripcion}" title="#{bundleActa.EditActaTitle_actDescripcion}" />
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_actnombrePreside}" for="actnombrePreside" />
+                        <p:inputText id="actnombrePreside" value="#{actaController.selected.actnombrePreside}" title="#{bundleActa.EditActaTitle_actnombrePreside}" />
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_actSecretario}" for="actSecretario" />
+                        <p:inputText id="actSecretario" value="#{actaController.selected.actSecretario}" title="#{bundleActa.EditActaTitle_actSecretario}" />
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_actDependencia}" for="actDependencia" />
+                        <p:inputText id="actDependencia" value="#{actaController.selected.actDependencia}" title="#{bundleActa.EditActaTitle_actDependencia}" />
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_actFormato}" for="actFormato" />
+                        <p:inputText id="actFormato" value="#{actaController.selected.actFormato}" title="#{bundleActa.EditActaTitle_actFormato}" />
+                        <p:outputLabel value="#{bundleActa.EditActaLabel_publicacion}" for="publicacion" />
+                        <p:selectOneMenu id="publicacion" value="#{actaController.selected.publicacion}" required="true" requiredMessage="#{bundleActa.EditActaRequiredMessage_publicacion}">
+                            <f:selectItem itemLabel="#{bundleActa.SelectOneMessage}"/>
+                            <f:selectItems value="#{publicacionController.itemsAvailableSelectOne}"
+                                           var="publicacionItem"
+                                           itemValue="#{publicacionItem}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{actaController.update}" value="#{bundleActa.Save}" update="display,:ActaListForm:datalist,:growl" oncomplete="handleSubmit(args, 'ActaEditDialog');"/>
+                    <p:commandButton value="#{bundleActa.Cancel}" onclick="ActaEditDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
