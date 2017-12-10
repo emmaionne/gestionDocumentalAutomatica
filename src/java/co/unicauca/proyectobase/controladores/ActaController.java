@@ -333,20 +333,23 @@ public class ActaController implements Serializable {
         Utilidades.redireccionar(cvc.getRuta());
     }
     
-    /*
+    /**
+     * 
+     */
     public void agregarPalabra(){
-        System.out.print("adicionando palabra "+keyword.getPalabra());
-        if(!keyword.getPalabra().equals("")){
-            if(!listaPalabras.contains(new Palabra(keyword.getPalabra()))){
-                listaPalabras.add(new Palabra(keyword.getPalabra()));
-                System.out.println("Palabra adicionada" + keyword.getPalabra());
+        System.out.print("adicionando palabra "+keyword.getPalClapalabra());
+        if(!keyword.getPalClapalabra().equals("")){
+            if(!listaPalabras.contains(new Palabra(keyword.getPalClapalabra())))
+            {
+                listaPalabras.add(new Palabra(keyword.getPalClapalabra()));
+                System.out.println("Palabra adicionada" + keyword.getPalClapalabra());
             }                        
         }
         else{
             //FacesContext.getCurrentInstance().addMessage("msjValAutores", new FacesMessage(FacesMessage.SEVERITY_ERROR, " not a text file", ""));
             System.out.println("palabra repetida");            
         }
-        keyword.setPalabra("");
+        keyword.setPalClapalabra("");
     }
     public void eliminarPalabra(String word){        
         System.out.print("eliminar palabra: " + word);        
@@ -364,7 +367,7 @@ public class ActaController implements Serializable {
         for (Palabra lis : listaPalabras) {
             System.out.print(lis.getWord()+ "     ");
         }
-    }   */ 
+    }   
     
 //</editor-fold>
 }
