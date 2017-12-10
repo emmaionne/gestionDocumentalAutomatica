@@ -17,7 +17,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
+import javax.faces.convert.FacesConverter; 
 
 /**
  * Clase controlador que se usa para registrar y editar una actividad de una práctica docente.
@@ -37,7 +37,7 @@ public class ActividadPdController implements Serializable {
     /**
      * Listado de las actividades de practica docente
      */
-    private List<ActividadPd> items = null;
+    private List<ActividadPd> items = null;    
     /**
      * Almacena temporalmente la actividad de la practica docente
      */
