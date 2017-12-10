@@ -139,5 +139,12 @@ public class CargarVistaCoordinador implements Serializable
         this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/listarPrac/VerPractica_Coord.xhtml";
         
     }
+    /**
+     * Ruta hacia la vista de creacion de acta
+     */
+    public void registrarDocumento()
+    {        
+        this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/gestionDocumentos/RegistrarActa.xhtml";        
+    }
     
 }
