@@ -254,6 +254,19 @@ public class ActaController implements Serializable {
         Utilidades.redireccionar(cvc.getRuta());
     }
     
+     /**
+     * Redireccion registrar resolucion coordinador
+     */
+    public void redirigirARegistrarCoorResolucion() {
+        this.prepareCreate(); // Inicializar el Objeto
+        listaPalabras.clear();
+        keyword = new PalabraClave();
+        cvc.registrarDocumentoResolucion();
+        Utilidades.redireccionar(cvc.getRuta());
+    }
+    
+    
+    
     /**
      * Agregar un acta a traves de un coordinador
      * @throws java.io.IOException

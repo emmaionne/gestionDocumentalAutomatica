@@ -147,4 +147,12 @@ public class CargarVistaCoordinador implements Serializable
         this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/gestionDocumentos/RegistrarActa.xhtml";        
     }
     
+    /**
+     * Ruta hacia la vista de creacion de resolucion
+     */
+    public void registrarDocumentoResolucion()
+    {        
+        this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/gestionDocumentos/RegistrarResolucion.xhtml";        
+    }
+    
 }
