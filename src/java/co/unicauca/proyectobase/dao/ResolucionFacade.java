@@ -7,6 +7,7 @@ package co.unicauca.proyectobase.dao;
 
 import co.unicauca.proyectobase.entidades.Coordinador;
 import co.unicauca.proyectobase.entidades.Resolucion;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -29,9 +30,4 @@ public class ResolucionFacade extends AbstractFacade<Resolucion> {
     public ResolucionFacade() {
         super(Resolucion.class);
     }
-
-    public Coordinador buscarCoordinador(String userName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }

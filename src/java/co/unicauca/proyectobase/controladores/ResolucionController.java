@@ -3,6 +3,7 @@ package co.unicauca.proyectobase.controladores;
 import co.unicauca.proyectobase.entidades.Resolucion;
 import co.unicauca.proyectobase.controladores.util.JsfUtil;
 import co.unicauca.proyectobase.controladores.util.JsfUtil.PersistAction;
+import co.unicauca.proyectobase.dao.PalabraClaveFacade;
 import co.unicauca.proyectobase.dao.PublicacionFacade;
 import co.unicauca.proyectobase.dao.ResolucionFacade;
 import co.unicauca.proyectobase.entidades.Coordinador;
@@ -36,6 +37,10 @@ public class ResolucionController implements Serializable {
 
     @EJB
     private co.unicauca.proyectobase.dao.ResolucionFacade ejbFacade;
+    @EJB
+    private co.unicauca.proyectobase.dao.CoordinadorFacade ejbFacadeCoordinador;
+    @EJB
+    private PalabraClaveFacade ejbFacadePalabra;
     @EJB
     private PublicacionFacade ejbPublicacion;
      
@@ -266,7 +271,7 @@ public class ResolucionController implements Serializable {
         Utilidades.redireccionar(cvc.getRuta());
     }        
     
-    public void AgregarResolucion(String userName) throws IOException{
+    public void AgregarResolucion(String userName) throws IOException {
         System.out.println("Registrando resolucion");
         // Formato Valido
         boolean formatoValido = true;
@@ -277,55 +282,52 @@ public class ResolucionController implements Serializable {
         }*/
         if (formatoValido) {
             boolean puedeSubir = false;
-            
+
             if (documento.getFileName().equalsIgnoreCase("")) {
-                FacesContext.getCurrentInstance().addMessage("Documento Acta", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe subir el archivo", ""));             
-            }
-            else 
+                FacesContext.getCurrentInstance().addMessage("Documento Acta", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe subir el archivo", ""));
+            } else {
                 puedeSubir = true;
-            
-            if(puedeSubir){
-                System.out.println("Agregando resolucion");
-                try{
-                    Coordinador coor = buscarCoordinador(userName);
-                    pub.setPubCooIdentificador(coor); //Identificar el coordinador
-                    int numPubRevis = ejbPublicacion.getnumFilasPubRev();
-                    pub.setPubIdentificador(numPubRevis);
-                
-                    pub.setPubTipoPublicacion("Resolución");
-                    selected.setPubIdentificador(numPubRevis);
-                    try{
-                        pub.AgregarActa(documento);
-                    }
-                    catch (IOException ex) {
-                        Logger.getLogger(ActaController.class.getName()).log(Level.SEVERE, null, ex);
-                        System.out.println("error Agregando acta");
-                    }
-                    //almacenar el objeto en la base de datos
-                    pub.setPubFechaPublicacion(new Date());
-                    ejbPublicacion.create(pub);
-                    ejbPublicacion.flush();                    
-                    ejbFacade.create(this.selected);
-                    //int numPal = ejbPalabra.getnumFilas();
-                    /* keyword.setIdActa(actual);
-                    if(!listaPalabras.isEmpty()){
-                        for(int i=0;i<listaPalabras.size();i++){
-                            keyword.setIdPal(numPal+i);
-                            keyword.setPalabra(listaPalabras.get(i).getWord());
-                            daoPalabra.create(keyword);
+            }
+
+            if (puedeSubir) {
+                if (!listaPalabras.isEmpty()) {
+                    System.out.println("Agregando resolucion");
+                    try {
+                        Coordinador coor = buscarCoordinador(userName);
+                        pub.setPubCooIdentificador(coor); //Identificar el coordinador
+                        int numPubRevis = ejbPublicacion.getnumFilasPubRev();
+                        pub.setPubIdentificador(numPubRevis);
+
+                        pub.setPubTipoPublicacion("Resolución");
+                        selected.setPubIdentificador(numPubRevis);
+                        try {
+                            pub.AgregarActa(documento);
+                        } catch (IOException ex) {
+                            Logger.getLogger(ActaController.class.getName()).log(Level.SEVERE, null, ex);
+                            System.out.println("error Agregando acta");
                         }
+                        //almacenar el objeto en la base de datos
+                        pub.setPubFechaPublicacion(new Date());
+                        ejbPublicacion.create(pub);
+                        ejbPublicacion.flush();
+                        ejbFacade.create(this.selected);
+
+                        //agregar la palabra clave a la tabla palabra
+                        int numPal = ejbFacadePalabra.getnumFilas();
+                        keyword.setPubIdentificador(pub);
+                        for (int i = 0; i < listaPalabras.size(); i++) {
+                            keyword.setPalClaidentificador(numPal + i);
+                            keyword.setPalClapalabra(listaPalabras.get(i).getWord());
+                            ejbFacadePalabra.create(keyword);
+                        }
+
+                        mensajeconfirmarRegistro();
+                        redirigirAlistar();
+                    } catch (EJBException ex) {
+                        System.out.println("Error: No se pudo registrar la resolucion error: " + ex.getMessage());
                     }
-                    else{
-                        keyword.setIdPal(numPal);
-                        daoPalabra.create(keyword);
-                    }
-                    */
-                    mensajeconfirmarRegistro();
-                    redirigirAlistar(); 
-                }
-                catch(EJBException ex)
-                {
-                    System.out.println("Error: No se pudo registrar el acta error: " + ex.getMessage());
+                } else {                    
+                    //ejbFacadePalabra.create(keyword);
                 }
             }
 
@@ -338,7 +340,7 @@ public class ResolucionController implements Serializable {
     }
     
     private Coordinador buscarCoordinador(String userName) {
-        return ejbFacade.buscarCoordinador(userName);
+        return ejbFacadeCoordinador.buscarCoordinador(userName);
     }
         
     //</editor-fold>
