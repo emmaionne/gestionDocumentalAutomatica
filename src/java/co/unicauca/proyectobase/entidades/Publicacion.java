@@ -451,6 +451,187 @@ public class Publicacion implements Serializable {
         
     }
     
+    
+    
+    
+    
+    
+    
+    
+    //<editor-fold defaultstate="collapsed" desc="metodos resolucion">
+    /**
+     * agregar archivo de resolucion a openKM
+     * @param ArchivoPD
+     * @throws IOException 
+     */
+    public void AgregarResolucion(UploadedFile ArchivoPD) throws IOException
+    {
+        MetodosPDF mpdf = new MetodosPDF();
+        Integer codigoCoor = this.pubCooIdentificador.getCooIdentificador();
+        String codigoFirma = mpdf.codigoFirma(codigoCoor+"");
+        codigoFirma = codigoFirma.trim();
+
+        PropiedadesOS os = new PropiedadesOS();
+        String nombrePD = "Resolucion-" + codigoFirma;
+        String realPath = FacesContext.getCurrentInstance().getExternalContext().getRealPath(os.getSeparator());
+        String destPD = realPath + "WEB-INF"+ os.getSeparator() +"temp" + os.getSeparator() + nombrePD + ".pdf";
+        Date date = new Date();
+        DateFormat datehourFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String estampaTiempo = "" + datehourFormat.format(date);
+        this.setPubFechaRegistro(date);
+        
+        ArrayList<tipoPDF_cargar> subidaArchivos = new ArrayList<>();
+         if (!ArchivoPD.getFileName().equalsIgnoreCase("")) {
+            tipoPDF_cargar resol = new tipoPDF_cargar();
+            resol.setNombreArchivo(nombrePD);
+            resol.setRutaArchivo(destPD);
+            resol.setTipoPDF(this.getPubTipoPublicacion());
+            resol.setArchivoIS(ArchivoPD.getInputstream());
+            subidaArchivos.add(resol);
+        }
+         
+         CrearPDFA_MetadataResol(subidaArchivos, estampaTiempo);
+         String hash = mpdf.obtenerHash(destPD);
+         SubirOpenKM_Resol(subidaArchivos, estampaTiempo, codigoFirma, hash);                 
+    }
+    
+    /**
+     * agregar metadatos de resolucion a openKM
+     * @param subidaArchivos archivos que se suben
+     * @param estampaTiempo 
+     */
+    private void CrearPDFA_MetadataResol(ArrayList<tipoPDF_cargar> subidaArchivos, String estampaTiempo)
+    {           
+        for (int s = 0; s < subidaArchivos.size(); s++) {
+            Document document = new Document();
+            PdfReader reader;         
+            try
+            {
+                PdfAWriter writer = PdfAWriter.getInstance(document, new FileOutputStream(
+                        subidaArchivos.get(s).getRutaArchivo()), PdfAConformanceLevel.PDF_A_1B);
+                writer.setTagged();               
+
+                Archivo arch = (Archivo) archivoCollection.toArray()[s];
+                                                        
+                document.addHeader("Identificador Publicacion", "" + this.pubIdentificador);
+                document.addHeader("Identificador Archivo", "" + arch.getArcIdentificador());
+                document.addHeader("tipoPDF_cargar", "" + subidaArchivos.get(s).getTipoPDF());
+                document.addHeader("Estampa Tiempo", "" + estampaTiempo);
+                document.addAuthor("" + this.pubCooIdentificador.getCooNombre());
+                document.addCreator("" + this.pubCooIdentificador.getCooNombre());
+                writer.setTagged();
+                writer.createXmpMetadata();
+                writer.setCompressionLevel(9);
+                document.open();
+                PdfContentByte cb = writer.getDirectContent();
+                reader = new PdfReader(subidaArchivos.get(s).getArchivoIS());
+                PdfImportedPage page;
+                int pageCount = reader.getNumberOfPages();
+                for (int i = 0; i < pageCount; i++) {
+                    document.newPage();
+                    page = writer.getImportedPage(reader, i + 1);
+                    cb.addTemplate(page, 0, 0);
+                }             
+            }catch(DocumentException | IOException de){
+                System.err.println("error en metodo CrearPDFA_MetadataPD() de clase publicacion.java");
+                System.out.println(de.getMessage());
+            }finally{
+               document.close();
+            }           
+        }        
+    }    
+    
+    /**
+     * subir archivo de resolucion a openkm
+     * @param subidaArchivos
+     * @param estampaTiempo
+     * @param codigoFirma
+     * @param hash 
+     */
+    public void SubirOpenKM_Resol(ArrayList<tipoPDF_cargar> subidaArchivos, String estampaTiempo, String codigoFirma, String hash) {
+        OKMWebservices ws = ConeccionOpenKM.getInstance().getWs();
+        String rutaFolderCrear;
+        
+        rutaFolderCrear = "/okm:root/Maestria_Automatica/Coordinador/Resoluciones";
+        validarCarpetaOpenKM(ws, rutaFolderCrear);
+        rutaFolderCrear = "/okm:root/Maestria_Automatica/Coordinador/Resoluciones/" + codigoFirma;
+        validarCarpetaOpenKM(ws, rutaFolderCrear);
+
+        this.setPubHash(hash);
+        this.setPubDiropkm(codigoFirma);
+
+        for (int i = 0; i < subidaArchivos.size(); i++) {
+            try {                
+                InputStream is = new FileInputStream("" + subidaArchivos.get(i).getRutaArchivo());
+                com.openkm.sdk4j.bean.Document doc = new com.openkm.sdk4j.bean.Document();
+                doc.setPath(rutaFolderCrear + "/" + subidaArchivos.get(i).getNombreArchivo() + ".pdf");
+                ws.createDocument(doc, is);
+
+                IOUtils.closeQuietly(is);
+                List<FormElement> fElements = ws.getPropertyGroupProperties("" + rutaFolderCrear + "/" + subidaArchivos.get(i).getNombreArchivo() + ".pdf", "okg:practica");
+                for (FormElement fElement : fElements) {
+                    if (fElement.getName().equals("okp:resolucion.identPublicacion")) {
+                        Input name = (Input) fElement;
+                        name.setValue("" + this.pubIdentificador);
+                    }
+                    if (fElement.getName().equals("okp:resolucion.tipoPDFCargar")) {
+                        Input name = (Input) fElement;
+                        name.setValue("" + subidaArchivos.get(i).getTipoPDF());
+                    }
+                    if (fElement.getName().equals("okp:resolucion.estampaTiempo")) {
+                        Input name = (Input) fElement;
+                        name.setValue("" + estampaTiempo);
+                    }
+                    if (fElement.getName().equals("okp:resolucion.noResolucion")) {
+                        Input name = (Input) fElement;
+                        name.setValue("" + this.pubEstIdentificador.getEstNombre());
+                    }
+                }
+                ws.setPropertyGroupProperties("" + rutaFolderCrear + "/" + subidaArchivos.get(i).getNombreArchivo() + ".pdf", "okg:resolucion", fElements);
+
+            } catch (IOException | ParseException | NoSuchPropertyException | NoSuchGroupException | LockException | PathNotFoundException
+                    | AccessDeniedException | RepositoryException | DatabaseException | ExtensionException | AutomationException | UnknowException
+                    | WebserviceException | UnsupportedMimeTypeException | FileSizeExceededException | UserQuotaExceededException
+                    | VirusDetectedException | ItemExistsException ex) {
+                Logger.getLogger(Publicacion.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }                  
+    }
+    
+    /**
+     * validar la existencia de un directorio en el directorio de trabajo de openKM
+     * @param ws objeto de OKMWebservices
+     * @param rutaFolderCrear ruta a la cual se le desea validadar su existencia
+     * @return TRUE si rutaFolderCrear es un drectorio valido, de lo contrario FALSE
+     */
+    public boolean validarCarpetaOpenKM(OKMWebservices ws, String rutaFolderCrear){
+        try {
+            /* Se valida si el forder a crear existe o no*/
+            return ws.isValidFolder(rutaFolderCrear);            
+        } catch (PathNotFoundException | AccessDeniedException | RepositoryException | DatabaseException | UnknowException | WebserviceException e) {
+            try {
+                Folder fld = new Folder();
+                fld.setPath(rutaFolderCrear);
+                ws.createFolder(fld);
+                return true;
+            } catch (AccessDeniedException | RepositoryException | PathNotFoundException | ItemExistsException | DatabaseException | ExtensionException | AutomationException | UnknowException | WebserviceException ex) {
+                Logger.getLogger(Publicacion.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("error en metodo validarCarpetaOpenKM de publicacion.java. error: " + e.getMessage());
+            }
+        }  
+        return false;
+    }
+    
+    //</editor-fold>
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public void AgregarActa(UploadedFile Archivo) throws IOException
     {
         MetodosPDF mpdf = new MetodosPDF();
@@ -1306,6 +1487,8 @@ public class Publicacion implements Serializable {
         }
         
     }
+    
+    
     
     /***
      * Metodo que retorna el nombre del tipo de documento a buscar en openKM
