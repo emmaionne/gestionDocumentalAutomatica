@@ -139,13 +139,6 @@ import org.primefaces.model.UploadedFile;
 
 public class Publicacion implements Serializable {
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
-    private Acta acta;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
-    private Resolucion resolucion;
-    @OneToMany(mappedBy = "pubIdentificador")
-    private List<PalabraClave> palabraClaveList;
-
     //Créditos de una publicación
     @Column(name = "pub_creditos")
     private Integer pubCreditos;
@@ -219,6 +212,15 @@ public class Publicacion implements Serializable {
     @JoinColumn(name = "pub_est_identificador", referencedColumnName = "est_identificador")
     @ManyToOne
     private Estudiante pubEstIdentificador;
+    // Relacion con acta 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
+    private Acta acta;
+    // Resolucion
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
+    private Resolucion resolucion;
+    // Palabra clave
+    @OneToMany(mappedBy = "pubIdentificador")
+    private List<PalabraClave> palabraClaveList;
 
     /* Constructores */
     public Publicacion() {
@@ -227,6 +229,7 @@ public class Publicacion implements Serializable {
         this.congreso = new Congreso();
         this.capituloLibro = new CapituloLibro();
         this.revista = new Revista();
+        this.acta = new Acta();
     }
 
     public Publicacion(Integer pubIdentificador) {
@@ -462,12 +465,12 @@ public class Publicacion implements Serializable {
         
         ArrayList<tipoPDF_cargar> subidaArchivos = new ArrayList<>();
          if (!Archivo.getFileName().equalsIgnoreCase("")) {
-            tipoPDF_cargar acta = new tipoPDF_cargar();
-            acta.setNombreArchivo(nombre);
-            acta.setRutaArchivo(destPD);
-            acta.setTipoPDF("Acta");
-            acta.setArchivoIS(Archivo.getInputstream());
-            subidaArchivos.add(acta);
+            tipoPDF_cargar doc_acta = new tipoPDF_cargar();
+            doc_acta.setNombreArchivo(nombre);
+            doc_acta.setRutaArchivo(destPD);
+            doc_acta.setTipoPDF("Acta");
+            doc_acta.setArchivoIS(Archivo.getInputstream());
+            subidaArchivos.add(doc_acta);
         }
          System.out.println(subidaArchivos.size());
          CrearPDF_MetadataPD_acta(subidaArchivos, estampaTiempo);
@@ -846,11 +849,6 @@ public class Publicacion implements Serializable {
             boolean crearFolder;
             String rutaFolderCrear;
             String annio;
-            /* codigoFirma - en este caso corresponde al nombre de la carpeta que contendra
-                el articulo y su tabla de contenido en formato PDFA
-                Ruta del folder a crear en el Gestor Openkm*/
-            // rutaFolderCrear = "/okm:root/Maestria_Automatica/" + codigoFirma;
-            
             // La ruta para guardar actas es /okm:root/Maestria_Automatica/Actas/Año
             Calendar c1 = Calendar.getInstance();
             annio = Integer.toString(c1.get(Calendar.YEAR));
@@ -882,6 +880,34 @@ public class Publicacion implements Serializable {
                         if (fElement.getName().equals("okp:acta.identPublicacion")) {
                             Input name = (Input) fElement;
                             name.setValue("" + this.pubIdentificador);
+                        }
+                        if (fElement.getName().equals("okp:acta.noActa")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + this.acta.getActNoActa());
+                        }
+                        if (fElement.getName().equals("okp:acta.descripcion")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + this.acta.getActDescripcion());
+                        }
+                        if (fElement.getName().equals("okp:acta.nombrePreside")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + this.acta.getActnombrePreside());
+                        }
+                        if (fElement.getName().equals("okp:acta.secretario")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + this.acta.getActSecretario());
+                        }
+                        if (fElement.getName().equals("okp:acta.dependencia")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + this.acta.getActDependencia());
+                        }
+                        if (fElement.getName().equals("okp:acta.formato")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + this.acta.getActFormato());
+                        }
+                        if (fElement.getName().equals("okp:acta.estampaTiempo")) {
+                            Input name = (Input) fElement;
+                            name.setValue("" + estampaTiempo);
                         }
                     }
                     ws.setPropertyGroupProperties("" + rutaFolderCrear + "/" + subidaArchivos.get(i).getNombreArchivo() + ".pdf", "okg:acta", fElements);
@@ -1056,6 +1082,7 @@ public class Publicacion implements Serializable {
             document.open();
             PdfContentByte cb = writer.getDirectContent();
             reader = new PdfReader(archivo.getArchivoIS());
+            document.close();
             PdfImportedPage page;
             int pageCount = reader.getNumberOfPages();
             for (int i = 0; i < pageCount; i++) {
@@ -1066,7 +1093,7 @@ public class Publicacion implements Serializable {
         } catch (DocumentException | IOException de) {
             System.err.println(de.getMessage());
         }
-        document.close();
+        
     }
     
     /**
@@ -1088,8 +1115,7 @@ public class Publicacion implements Serializable {
                 //Archivo arch = (Archivo) archivoCollection.toArray()[s];
                                                         
                 document.addHeader("Identificador Publicacion", "" + this.pubIdentificador);
-                //document.addHeader("Identificador Archivo", "" + arch.getArcIdentificador());
-                //document.addHeader("tipoPDF_cargar", "" + subidaArchivos.get(s).getTipoPDF());
+                document.addHeader("tipoPDF_cargar", "" + subidaArchivos.get(s).getTipoPDF());
                 document.addHeader("Estampa Tiempo", "" + estampaTiempo);
                 
                 document.addAuthor("");
@@ -1106,12 +1132,13 @@ public class Publicacion implements Serializable {
                     document.newPage();
                     page = writer.getImportedPage(reader, i + 1);
                     cb.addTemplate(page, 0, 0);
-                } 
+                }
                 document.close();
             }catch(DocumentException | IOException de){
                 System.err.println("error en metodo CrearPDFA_MetadataPD() de clase publicacion.java para acta");
                 System.out.println(de.getMessage());
-            }       
+            } 
+            
         }
         
     }    
