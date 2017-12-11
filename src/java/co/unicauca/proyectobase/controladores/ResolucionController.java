@@ -226,6 +226,7 @@ public class ResolucionController implements Serializable {
         this.prepareCreate(); // Inicializar el Objeto
         listaPalabras.clear();
         keyword = new PalabraClave();
+        pub = new Publicacion();
         cvc.registrarDocumentoResolucion();
         Utilidades.redireccionar(cvc.getRuta());
     }
@@ -240,14 +241,15 @@ public class ResolucionController implements Serializable {
             {
                 listaPalabras.add(new Palabra(keyword.getPalClapalabra()));
                 System.out.println("Palabra adicionada" + keyword.getPalClapalabra());
+                keyword = new PalabraClave();
             }                        
         }
         else{
             //FacesContext.getCurrentInstance().addMessage("msjValAutores", new FacesMessage(FacesMessage.SEVERITY_ERROR, " not a text file", ""));
             System.out.println("palabra repetida");            
-        }
-        keyword.setPalClapalabra("");
+        }        
     }
+    
     public void eliminarPalabra(String word){        
         System.out.print("eliminar palabra: " + word);        
         for (int i = 0; i < listaPalabras.size(); i++) {
@@ -296,20 +298,22 @@ public class ResolucionController implements Serializable {
                         Coordinador coor = buscarCoordinador(userName);
                         pub.setPubCooIdentificador(coor); //Identificar el coordinador
                         int numPubRevis = ejbPublicacion.getnumFilasPubRev();
-                        pub.setPubIdentificador(numPubRevis);
-
+                        pub.setPubIdentificador(numPubRevis);                                                
                         pub.setPubTipoPublicacion("Resolución");
-                        selected.setPubIdentificador(numPubRevis);
-                        try {
-                            pub.AgregarActa(documento);
+                        
+                        selected.setPubIdentificador(pub.getPubIdentificador());
+                        try {                            
+                            pub.AgregarResolucion(documento);
                         } catch (IOException ex) {
                             Logger.getLogger(ActaController.class.getName()).log(Level.SEVERE, null, ex);
                             System.out.println("error Agregando acta");
                         }
                         //almacenar el objeto en la base de datos
                         pub.setPubFechaPublicacion(new Date());
+                        System.out.println("creando publicacion");
                         ejbPublicacion.create(pub);
                         ejbPublicacion.flush();
+                        System.out.println("creando resolucion");
                         ejbFacade.create(this.selected);
 
                         //agregar la palabra clave a la tabla palabra
