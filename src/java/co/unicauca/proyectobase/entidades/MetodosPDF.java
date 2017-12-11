@@ -47,7 +47,7 @@ public class MetodosPDF {
         document.addKeywords("Metadata, iText, PDF");
         document.addCreator("My program using iText");
         document.open();
-        // step 4: agregar el conteido, en este caso "Parrafo 1"
+        // step 4: agregar el contenido, en este caso "Parrafo 1"
         document.add(new Paragraph("Parrafo 1"));
         // step 5: cerrar el archivo que se creo
         document.close();

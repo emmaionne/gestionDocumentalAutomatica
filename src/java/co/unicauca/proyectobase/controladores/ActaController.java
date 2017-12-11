@@ -278,9 +278,7 @@ public class ActaController implements Serializable {
             
             if(puedeSubir){
                 System.out.println("Agregando Acta");
-                Coordinador coor = getCoordinador(); // el acta esta relacionada con este coordinador
                 try{
-                    // pub.setPubCooIdentificador(coor); Identificar el coordinador
                     int numPubRevis = ejbPublicacion.getnumFilasPubRev();
                     pub.setPubIdentificador(numPubRevis);
                 
@@ -299,19 +297,19 @@ public class ActaController implements Serializable {
                     ejbPublicacion.flush();                    
                     ejbFacade.create(this.actual);
                     int numPal = ejbPalabra.getnumFilas();
-                    /* keyword.setIdActa(actual);
+                    keyword.setPubIdentificador(pub);
                     if(!listaPalabras.isEmpty()){
                         for(int i=0;i<listaPalabras.size();i++){
-                            keyword.setIdPal(numPal+i);
-                            keyword.setPalabra(listaPalabras.get(i).getWord());
-                            daoPalabra.create(keyword);
+                            keyword.setPalClaidentificador(numPal+i);
+                            keyword.setPalClapalabra(listaPalabras.get(i).getWord());
+                            ejbPalabra.create(keyword);
                         }
                     }
                     else{
-                        keyword.setIdPal(numPal);
-                        daoPalabra.create(keyword);
+                        keyword.setPalClaidentificador(numPal);
+                        ejbPalabra.create(keyword);
                     }
-                    */
+                   
                     mensajeconfirmarRegistro();
                     redirigirAlistar(); 
                 }
