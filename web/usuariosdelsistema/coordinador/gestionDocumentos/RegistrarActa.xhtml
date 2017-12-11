@@ -31,10 +31,14 @@
                 
                 <h:panelGrid columns="3" cellpadding="5">
                     
-                    <p:outputLabel value="Formato :" styleClass="addEspacio"/>
-                    <p:inputText  id="valFormato"  value="#{actaController.selected.actFormato}"  size="35"/>
-                    <p:outputLabel value="" styleClass="addEspacio"/>
+                    <p:outputLabel value="#{bundleActa.CreateActaLabel_actFormato}" styleClass="addEspacio"/>
+                    <p:inputText  id="valFormato"  value="#{actaController.selected.actFormato}" size="35"/>
+                    <p:outputLabel value=""/>
                    
+                    <p:outputLabel value="#{bundleActa.EditActaLabel_actNoActa}" styleClass="addEspacio"/>
+                    <p:inputText  id="valNoActa"  value="#{actaController.selected.actNoActa}"  size="35"/>
+                    <p:outputLabel value=""/>
+                                    
                     <p:outputLabel value="Nombre :" styleClass="addEspacio"/>
                     <p:inputText  id="valNombre"  value="#{actaController.selected.actNombre}"  size="35"/>
                     <p:outputLabel value="" styleClass="addEspacio"/>
@@ -52,9 +56,11 @@
                     </p:calendar>
                     <p:message for="event" id="msjValFechaPublicacion" />
                     
-                    <p:outputLabel value="Descripción :" styleClass="addEspacio"/>
-                    <p:inputText  id="valDescripcion"  value="#{actaController.selected.actDescripcion}"  size="35"/>
                     <p:outputLabel value="" styleClass="addEspacio"/>
+                    <p:inputTextarea value="#{actaController.selected.actDescripcion}" rows="5" cols="50" counter="desc" 
+                                         maxlength="5000" counterTemplate="{0} caracteres disponibles." autoResize="false" 
+                                         title="Descripción"/>
+                    <h:outputText id="desc" /> 
                     
                     <p:outputLabel value="Nombre Preside :" styleClass="addEspacio"/>
                     <p:inputText  id="valPreside"  value="#{actaController.selected.actnombrePreside}"  size="35"/>
