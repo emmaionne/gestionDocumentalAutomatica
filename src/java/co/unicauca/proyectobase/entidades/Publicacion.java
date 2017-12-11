@@ -523,6 +523,11 @@ public class Publicacion implements Serializable {
                 writer.createXmpMetadata();
                 writer.setCompressionLevel(9);
                 document.open();
+                if(document.isOpen()){
+                    System.out.println("documento abierto");
+                }else{
+                    System.out.println("documento no abierto");                            
+                }
                 PdfContentByte cb = writer.getDirectContent();
                 reader = new PdfReader(subidaArchivos.get(s).getArchivoIS());
                 PdfImportedPage page;
@@ -531,13 +536,13 @@ public class Publicacion implements Serializable {
                     document.newPage();
                     page = writer.getImportedPage(reader, i + 1);
                     cb.addTemplate(page, 0, 0);
-                }             
+                }
+                document.close();
             }catch(DocumentException | IOException de){
                 System.err.println("error en metodo CrearPDFA_MetadataPD() de clase publicacion.java");
                 System.out.println(de.getMessage());
-            }finally{
-               document.close();
-            }           
+                document.close();
+            }                           
         }        
     }    
     
