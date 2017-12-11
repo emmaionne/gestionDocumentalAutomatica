@@ -139,6 +139,10 @@ import org.primefaces.model.UploadedFile;
 
 public class Publicacion implements Serializable {
 
+    @JoinColumn(name = "pub_coo_identificador", referencedColumnName = "coo_identificador")
+    @ManyToOne(optional = false)
+    private Coordinador pubCooIdentificador;
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
     private Acta acta;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "publicacion")
@@ -1609,6 +1613,14 @@ public class Publicacion implements Serializable {
 
     public void setPalabraClaveList(List<PalabraClave> palabraClaveList) {
         this.palabraClaveList = palabraClaveList;
+    }
+
+    public Coordinador getPubCooIdentificador() {
+        return pubCooIdentificador;
+    }
+
+    public void setPubCooIdentificador(Coordinador pubCooIdentificador) {
+        this.pubCooIdentificador = pubCooIdentificador;
     }
 
 }

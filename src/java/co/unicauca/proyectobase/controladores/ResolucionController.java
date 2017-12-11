@@ -3,9 +3,18 @@ package co.unicauca.proyectobase.controladores;
 import co.unicauca.proyectobase.entidades.Resolucion;
 import co.unicauca.proyectobase.controladores.util.JsfUtil;
 import co.unicauca.proyectobase.controladores.util.JsfUtil.PersistAction;
+import co.unicauca.proyectobase.dao.PublicacionFacade;
 import co.unicauca.proyectobase.dao.ResolucionFacade;
+import co.unicauca.proyectobase.entidades.Coordinador;
+import co.unicauca.proyectobase.entidades.PalabraClave;
+import co.unicauca.proyectobase.entidades.Publicacion;
+import co.unicauca.proyectobase.utilidades.Palabra;
+import co.unicauca.proyectobase.utilidades.Utilidades;
+import java.io.IOException;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -14,10 +23,12 @@ import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
+import org.primefaces.model.UploadedFile;
 
 @Named("resolucionController")
 @SessionScoped
@@ -25,8 +36,19 @@ public class ResolucionController implements Serializable {
 
     @EJB
     private co.unicauca.proyectobase.dao.ResolucionFacade ejbFacade;
+    @EJB
+    private PublicacionFacade ejbPublicacion;
+     
     private List<Resolucion> items = null;
+    
+    private UploadedFile documento;
+    private Coordinador coordinador;
+    private Publicacion pub;
+    
     private Resolucion selected;
+    List<Palabra> listaPalabras = new ArrayList<>();
+    private PalabraClave keyword;
+    private CargarVistaCoordinador cvc = new CargarVistaCoordinador();
 
     public ResolucionController() {
     }
@@ -162,4 +184,166 @@ public class ResolucionController implements Serializable {
 
     }
 
+    //<editor-fold defaultstate="collapsed" desc="setter´s and getter´s">
+    public List<Palabra> getListaPalabras() {
+        return listaPalabras;
+    }
+
+    public void setListaPalabras(List<Palabra> listaPalabras) {
+        this.listaPalabras = listaPalabras;
+    }
+    
+    public PalabraClave getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(PalabraClave keyword) {
+        this.keyword = keyword;
+    }
+    
+     public UploadedFile getDocumento() {
+        return documento;
+    }
+
+    public void setDocumento(UploadedFile documento) {
+        this.documento = documento;
+    }
+    //</editor-fold>
+    
+    
+    
+    //<editor-fold defaultstate="collapsed" desc="codigo nuevo">
+    
+    /**
+     * Redireccion registrar resolucion coordinador
+     */
+    public void redirigirARegistrarCoorResolucion() {
+        this.prepareCreate(); // Inicializar el Objeto
+        listaPalabras.clear();
+        keyword = new PalabraClave();
+        cvc.registrarDocumentoResolucion();
+        Utilidades.redireccionar(cvc.getRuta());
+    }
+    
+    /**
+     * 
+     */
+    public void agregarPalabra(){
+        System.out.print("adicionando palabra "+keyword.getPalClapalabra());
+        if(!keyword.getPalClapalabra().equals("")){
+            if(!listaPalabras.contains(new Palabra(keyword.getPalClapalabra())))
+            {
+                listaPalabras.add(new Palabra(keyword.getPalClapalabra()));
+                System.out.println("Palabra adicionada" + keyword.getPalClapalabra());
+            }                        
+        }
+        else{
+            //FacesContext.getCurrentInstance().addMessage("msjValAutores", new FacesMessage(FacesMessage.SEVERITY_ERROR, " not a text file", ""));
+            System.out.println("palabra repetida");            
+        }
+        keyword.setPalClapalabra("");
+    }
+    public void eliminarPalabra(String word){        
+        System.out.print("eliminar palabra: " + word);        
+        for (int i = 0; i < listaPalabras.size(); i++) {
+            if(listaPalabras.get(i).getWord().equals(word)){
+                listaPalabras.remove(i);
+                break;
+            }
+        }
+        System.out.println("  tamaño: " + listaPalabras.size());        
+        mostrarLista();
+    }
+    public void mostrarLista(){
+        System.out.println("mostrando lista....");
+        for (Palabra lis : listaPalabras) {
+            System.out.print(lis.getWord()+ "     ");
+        }
+    }   
+    
+    public void redirigirAlistar() {                
+        cvc.listarEstudiantes();
+        Utilidades.redireccionar(cvc.getRuta());
+    }        
+    
+    public void AgregarResolucion(String userName) throws IOException{
+        System.out.println("Registrando resolucion");
+        // Formato Valido
+        boolean formatoValido = true;
+        /*if (!documento.getFileName().equalsIgnoreCase("") && !"application/pdf".equals(documento.getContentType())) {
+
+            FacesContext.getCurrentInstance().addMessage("valPublicacion", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Se debe subir el documento en formato pdf", ""));
+            formatoValido = false;
+        }*/
+        if (formatoValido) {
+            boolean puedeSubir = false;
+            
+            if (documento.getFileName().equalsIgnoreCase("")) {
+                FacesContext.getCurrentInstance().addMessage("Documento Acta", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe subir el archivo", ""));             
+            }
+            else 
+                puedeSubir = true;
+            
+            if(puedeSubir){
+                System.out.println("Agregando resolucion");
+                try{
+                    Coordinador coor = buscarCoordinador(userName);
+                    pub.setPubCooIdentificador(coor); //Identificar el coordinador
+                    int numPubRevis = ejbPublicacion.getnumFilasPubRev();
+                    pub.setPubIdentificador(numPubRevis);
+                
+                    pub.setPubTipoPublicacion("Resolución");
+                    selected.setPubIdentificador(numPubRevis);
+                    try{
+                        pub.AgregarActa(documento);
+                    }
+                    catch (IOException ex) {
+                        Logger.getLogger(ActaController.class.getName()).log(Level.SEVERE, null, ex);
+                        System.out.println("error Agregando acta");
+                    }
+                    //almacenar el objeto en la base de datos
+                    pub.setPubFechaPublicacion(new Date());
+                    ejbPublicacion.create(pub);
+                    ejbPublicacion.flush();                    
+                    ejbFacade.create(this.selected);
+                    //int numPal = ejbPalabra.getnumFilas();
+                    /* keyword.setIdActa(actual);
+                    if(!listaPalabras.isEmpty()){
+                        for(int i=0;i<listaPalabras.size();i++){
+                            keyword.setIdPal(numPal+i);
+                            keyword.setPalabra(listaPalabras.get(i).getWord());
+                            daoPalabra.create(keyword);
+                        }
+                    }
+                    else{
+                        keyword.setIdPal(numPal);
+                        daoPalabra.create(keyword);
+                    }
+                    */
+                    mensajeconfirmarRegistro();
+                    redirigirAlistar(); 
+                }
+                catch(EJBException ex)
+                {
+                    System.out.println("Error: No se pudo registrar el acta error: " + ex.getMessage());
+                }
+            }
+
+        }
+
+    }
+    
+    public void mensajeconfirmarRegistro() {
+        System.out.println("Registrada con exito");
+    }
+    
+    private Coordinador buscarCoordinador(String userName) {
+        return ejbFacade.buscarCoordinador(userName);
+    }
+        
+    //</editor-fold>
+    
+    
+    
+    
 }

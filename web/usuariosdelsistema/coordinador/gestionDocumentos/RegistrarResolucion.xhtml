@@ -23,7 +23,67 @@
         </h:form> 
         
         
-        
+        <h:form id="ResolucionCreateForm">
+            <p:panel id="display1" rendered="#{resolucionController.selected != null}">
+                    <h:panelGrid columns="3" >                        
+                        
+                        <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_resNumero}"/>
+                        <p:inputText id="resNumero" value="#{resolucionController.selected.resNumero}" 
+                                     title="#{bundleResolucion.CreateResolucionTitle_resNumero}" />
+                        <p:outputLabel value=""/>                        
+                        
+                        <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_resDescripcion}"/>
+                        <p:inputTextarea value="#{resolucionController.selected.resDescripcion}" rows="5" cols="50" counter="desc" 
+                                         maxlength="5000" counterTemplate="{0} caracteres disponibles." autoResize="false" 
+                                         title="#{bundleResolucion.CreateResolucionTitle_resDescripcion}"/>
+                        <h:outputText id="desc" />                                                
+                        
+                        <p:outputLabel value="Palabra Clave :" styleClass="addEspacio"/>
+                        <p:inputText  id="valKW"  value="#{resolucionController.keyword.palClapalabra}"  size="35"/>
+                        <p:commandButton id="agregarPalabra" icon="ui-icon-plus">
+                            <p:ajax event="click" listener="#{resolucionController.agregarPalabra()}" update="valKW, tablaPalabras"/>
+                        </p:commandButton>
+                                                
+                        <p:outputLabel value=""/>
+                        <p:dataTable id ="tablaPalabras" value="#{resolucionController.listaPalabras}" var="pal" style="width:302px;" emptyMessage="" rendered="true">
+                            <p:column width="180">
+                                <p:outputLabel value="#{pal.word}" id="palabraClave"/>                                
+                            </p:column>                            
+                            <p:column  class="gridsinbordes" width="22">
+                                <p:commandButton id="eliminarPalabra" icon="ui-icon-close">
+                                    <f:ajax event="click" listener="#{resolucionController.eliminarPalabra(Palabra.word)}" 
+                                            render="tablaPalabras" />                                    
+                                </p:commandButton>
+                            </p:column>                                                            
+                        </p:dataTable>  
+                        <p:outputLabel value="" styleClass="addEspacio"/> 
+                        <h:panelGroup>
+                            <p:outputLabel value="Archivo: " styleClass="addEspacio"/>
+                            <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />&nbsp;
+                        </h:panelGroup>
+                        <p:fileUpload id="archivo"   value="#{resolucionController.documento}" required="true" mode="simple" allowTypes="/(\.|\/)(pdf)$/" styleClass="addEspacio"/>                        
+                        <p:messages for="valTContenido"  id="msjvalTContenido" />
+                        <h:outputText value=""/>
+
+
+                    </h:panelGrid>
+                
+                <h:form>
+                    <h:panelGrid columns="2" cellspacing="10>">
+                        <h:commandButton value="#{bundleResolucion.Save}" actionListener="#{resolucionController.AgregarResolucion(userLoginView.username)}" class="btn btn-primary"/> 
+                        <h:commandButton value="Cancelar" onclick="if (!confirm('¿Desea cancelar el registro del documento?')) {
+                                return false;
+                            }
+                            ;
+                            return true;" action="#{resolucionController.redirigirAlistar()}" class="btn btn-primary" immediate="true"/>
+                    </h:panelGrid>
+                </h:form>
+                
+
+                    <p:commandButton actionListener="#{resolucionController.create}" value="#{bundleResolucion.Save}" update="ResolucionCreateForm"/>
+                    <p:commandButton value="#{bundleResolucion.Cancel}"/>
+                </p:panel>
+            </h:form>
 
 
         

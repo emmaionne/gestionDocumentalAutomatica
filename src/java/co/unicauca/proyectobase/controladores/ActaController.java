@@ -252,20 +252,7 @@ public class ActaController implements Serializable {
         keyword = new PalabraClave();
         cvc.registrarDocumento();
         Utilidades.redireccionar(cvc.getRuta());
-    }
-    
-     /**
-     * Redireccion registrar resolucion coordinador
-     */
-    public void redirigirARegistrarCoorResolucion() {
-        this.prepareCreate(); // Inicializar el Objeto
-        listaPalabras.clear();
-        keyword = new PalabraClave();
-        cvc.registrarDocumentoResolucion();
-        Utilidades.redireccionar(cvc.getRuta());
-    }
-    
-    
+    }             
     
     /**
      * Agregar un acta a traves de un coordinador
@@ -337,6 +324,7 @@ public class ActaController implements Serializable {
         }
 
     }
+    
     public void mensajeconfirmarRegistro() {
         System.out.println("Registrada con exito");
     }

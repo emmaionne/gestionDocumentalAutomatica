@@ -40,6 +40,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Coordinador.findByCooUsuario", query = "SELECT c FROM Coordinador c WHERE c.cooUsuario = :cooUsuario")})
 public class Coordinador implements Serializable {
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "pubCooIdentificador")
+    private List<Publicacion> publicacionList;
+
     @JoinColumn(name = "usuario_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Usuario usuarioId;
@@ -161,4 +164,13 @@ public class Coordinador implements Serializable {
     public String toString() {
         return "co.unicauca.proyectobase.entidades.Coordinador[ cooIdentificador=" + cooIdentificador + " ]";
     }    
+
+    @XmlTransient
+    public List<Publicacion> getPublicacionList() {
+        return publicacionList;
+    }
+
+    public void setPublicacionList(List<Publicacion> publicacionList) {
+        this.publicacionList = publicacionList;
+    }
 }
