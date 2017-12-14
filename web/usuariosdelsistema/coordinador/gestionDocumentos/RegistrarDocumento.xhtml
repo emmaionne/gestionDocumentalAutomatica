@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    
+    <h:head>
+        <title>Registrar Actas</title>
+    </h:head>
+    
+    <ui:composition template="./../../../plantillas/Coordinador.xhtml">
+
+    <ui:define name="content">
+        
+        <h:form>
+            <ui:insert>
+                <ui:include src="TabRegistrar.xhtml"></ui:include>
+            </ui:insert>
+        </h:form> 
+        
+        <h:form id="form_registrar_acta" enctype="multipart/form-data">
+            <p:panel>
+                <h:panelGrid columns="3">
+                    
+                    <p:outputLabel for="formato" value="#{bundleActa.CreateActaLabel_actFormato}" />
+                    <p:selectOneMenu id="formato" value="#{actaController.selected.actFormato}" effect="fold" editable="true">
+                        <f:selectItem itemLabel="Seleccionar" itemValue="" />
+                        <f:selectItems value="#{selectOneMenuView.formatos}" />
+                    </p:selectOneMenu>
+                    <p:outputLabel value=""/>
+                    
+                    <p:outputLabel value="#{bundleActa.EditActaLabel_actNoActa}" />
+                    <p:inputText  id="NoActa"  value="#{actaController.selected.actNoActa}"  size="35"/>
+                    <p:outputLabel value=""/>
+                  
+                    <p:outputLabel for="nombre" value="Nombre: " />
+                    <p:selectOneMenu id="nombre" value="#{actaController.selected.actNombre}" effect="fold" editable="true">
+                        <f:selectItem itemLabel="Seleccionar" itemValue="" />
+                        <f:selectItems value="#{selectOneMenuView.nombres}" />
+                    </p:selectOneMenu>
+                    <p:outputLabel value=""/>
+                    
+                    <p:outputLabel for="dependencia" value="#{bundleActa.CreateActaLabel_actDependencia}" />
+                    <p:selectOneMenu id="dependencia" value="#{actaController.selected.actDependencia}" effect="fold" editable="true">
+                        <f:selectItem itemLabel="Seleccionar" itemValue="" />
+                        <f:selectItems value="#{selectOneMenuView.dependencias}" />
+                    </p:selectOneMenu>
+                    <p:outputLabel value=""/>
+                    
+                    <p:outputLabel value="Fecha: "/>
+                    <p:calendar  id="event" value="#{actaController.selected.actFecha}" maxdate="#{currentDay}" size="35" 
+                                 pattern="yyyy-MMM-dd" navigator="true" autocomplete="false" locale="es" required="true">
+                        <p:ajax event="dateSelect" listener="#{publicacionController.onDateSelect}"  />
+                    </p:calendar>
+                    <p:message for="event" id="msjValFechaPublicacion" />
+                    
+                    <p:outputLabel value="#{bundleActa.CreateActaLabel_actDescripcion}"/>
+                    <p:inputTextarea value="#{actaController.selected.actDescripcion}" rows="5" cols="50" counter="desc" 
+                                         maxlength="5000" counterTemplate="{0} caracteres disponibles." autoResize="false" 
+                                         title="Descripción"/>
+                    <h:outputText id="desc" /> 
+                    
+                    <p:outputLabel value="#{bundleActa.CreateActaLabel_actnombrePreside}" styleClass="addEspacio"/>
+                    <p:inputText  id="valPreside"  value="#{actaController.selected.actnombrePreside}"  size="35"/>
+                    <p:outputLabel value=""/>
+                    
+                    <p:outputLabel value="#{bundleActa.CreateActaLabel_actSecretario}" />
+                    <p:inputText  id="valSecretario"  value="#{actaController.selected.actSecretario}"  size="35"/>
+                    <p:outputLabel value=""/>
+                    
+                    <p:outputLabel value="Palabra Clave:" styleClass="addEspacio"/>
+                    <p:inputText id="valKW"  value="#{actaController.keyword.palClapalabra}" placeholder="Ingrese las palabras clave" size="43">
+                        <f:validator validatorId="validadorAutoresSecundarios" />
+                        <p:ajax event="blur"/> 
+                    </p:inputText>
+                    <p:commandButton id="agregarPalabra" icon="ui-icon-plus">
+                        <p:ajax event="click" listener="#{actaController.agregarPalabra()}" update="valKW, tablaPalabras"/>
+                    </p:commandButton>
+                        
+                    <p:outputLabel value="" /> 
+                    <p:dataTable id ="tablaPalabras" value="#{actaController.listaPalabras}" var="pal" style="width:302px;" emptyMessage="" rendered="true">
+                        <p:column width="180">
+                            <p:outputLabel value="#{pal.word}" id="palabraClave"/>                                
+                        </p:column>                            
+                        <p:column  class="gridsinbordes" width="22">
+                            <p:commandButton id="eliminarPalabra" icon="ui-icon-close">
+                                <f:ajax event="click" listener="#{actaController.eliminarPalabra(pal.word)}" 
+                                        render="tablaPalabras" />                                    
+                            </p:commandButton>
+                        </p:column>                                                            
+                    </p:dataTable>  
+                    <p:outputLabel value="" styleClass="addEspacio"/> 
+                    
+                    <h:panelGroup>
+                        <p:outputLabel value="Acta: " styleClass="addEspacio"/>
+                        <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />&nbsp;
+                    </h:panelGroup>
+                    <p:fileUpload id="archivo" value="#{actaController.documento}" required="true" mode="simple" />                        
+                    <p:messages for="valTContenido"  id="msjvalTContenido" />
+                    <h:outputText value=""/>
+                    
+                </h:panelGrid>
+                
+                <h:form>
+                    <h:panelGrid columns="2" cellspacing="10>">
+                        <p:commandButton value="Guardar" actionListener="#{actaController.AgregarActa()}" class="btn btn-primary" ajax="false"/> 
+                        <p:commandButton value="Cancelar" onclick="if (!confirm('¿Desea cancelar el registro del documento?')) {
+                                return false;
+                            }
+                            ;
+                            return true;" action="#{actaController.redirigirAlistar()}" class="btn btn-primary" immediate="true"/>
+                    </h:panelGrid>
+                </h:form>
+                
+            </p:panel>
+        </h:form>
+    </ui:define>
+    </ui:composition>
+
+</html>

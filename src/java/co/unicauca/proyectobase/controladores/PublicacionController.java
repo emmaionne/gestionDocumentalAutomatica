@@ -17,6 +17,7 @@ import co.unicauca.proyectobase.entidades.Libro;
 import co.unicauca.proyectobase.entidades.CapituloLibro;
 import co.unicauca.proyectobase.entidades.Ciudad;
 import co.unicauca.proyectobase.entidades.Pais;
+import co.unicauca.proyectobase.entidades.PalabraClave;
 import co.unicauca.proyectobase.entidades.archivoPDF;
 import co.unicauca.proyectobase.utilidades.Autor;
 import co.unicauca.proyectobase.utilidades.ConeccionOpenKM;
@@ -153,6 +154,10 @@ public class PublicacionController implements Serializable {
     private int idCiudad;
     //Para comprobar el numero de documentos que no son validos al momento de subir
     private int numeroDocumentos;
+       
+    String INICIO = "index";
+    String CREAR = "new";
+    String EDITAR = "editar";
 
     /* Constructores */
     public PublicacionController() {
@@ -166,8 +171,8 @@ public class PublicacionController implements Serializable {
         cvc = new CargarVistaCoordinador();
         this.listaPaises = new ArrayList<>();
     }
+    //<editor-fold defaultstate="collapsed" desc="/* Getters y Setters */">
     
-    /* Getters y Setters */
     public String getTipoPublicacion() {
         return tipoPublicacion;
     }
@@ -221,10 +226,10 @@ public class PublicacionController implements Serializable {
     }
 
     public void setPublicacionPDF(UploadedFile publicacionPDF) {
-
         this.publicacionPDF = publicacionPDF;
     }
 
+    
     public UploadedFile getTablaContenidoPDF() {
 
         return TablaContenidoPDF;
@@ -265,7 +270,8 @@ public class PublicacionController implements Serializable {
     public void setVariableFiltrado(String variableFiltrado) {
         this.variableFiltrado = variableFiltrado;
     }
-
+    //</editor-fold>
+    
     /* Métodos */
     public void onComplete() {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Progress Completed", "Progress Completed"));
@@ -315,19 +321,14 @@ public class PublicacionController implements Serializable {
     }
 
     /**
-     * Obtener el nombre com
+     * Obtener el nombre completo
      * @param nombreUsuario
      * @return 
      */
     public String obtenerNombreUsuarioById(Estudiante nombreUsuario) {
         return daoEst.findNombreById(nombreUsuario);
     }
-
-   
-    String INICIO = "index";
-    String CREAR = "new";
-    String EDITAR = "editar";
-
+    
     public Publicacion getActual() {
         if (actual == null) {
             actual = new Publicacion();
@@ -347,6 +348,25 @@ public class PublicacionController implements Serializable {
             return daoPublicacion.ListadoPublicacionFilt(variableFiltrado);
         }
     }
+    
+    public List<Publicacion> listadoDocumentos() {
+        System.out.println("variable " + variableFiltrado);
+        /*if ((variableFiltrado == null) || (variableFiltrado.equals(""))) {
+            return daoPublicacion.ListadoSoloDocumentos();
+        } else {
+            */
+        List<Publicacion> prueba;
+        prueba=daoPublicacion.ListadoSoloDocumentos();
+        if(!prueba.isEmpty()){
+            for(int i=0;i<prueba.size();i++){
+	        System.out.println(prueba.get(i).getPubDiropkm());
+	    }
+            
+        }
+        return prueba;  
+       
+    }
+    
 
     public List<Publicacion> listadoEspera() {
         if ((variableFiltrado == null) || (variableFiltrado.equals(""))) {
@@ -1157,6 +1177,12 @@ public class PublicacionController implements Serializable {
 
     public void redirigirGraficaPubVis() {
         cvc.verGraficaPubVis();
+        Utilidades.redireccionar(cvc.getRuta());
+    }
+    public void redirigirListarDocumentacion()
+    {
+        this.
+        cvc.ListarDocumentacion();
         Utilidades.redireccionar(cvc.getRuta());
     }
     //</editor-fold>

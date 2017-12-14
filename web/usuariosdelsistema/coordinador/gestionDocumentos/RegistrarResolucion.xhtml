@@ -9,7 +9,7 @@
 
     
     <h:head>
-        <title>Registrar Actas</title>
+        <title>Registrar Resolución</title>
     </h:head>
     
     <ui:composition template="./../../../plantillas/Coordinador.xhtml">
@@ -23,14 +23,22 @@
         </h:form> 
         
         
-        <h:form id="ResolucionCreateForm">
+        <h:form id="ResolucionCreateForm" enctype="multipart/form-data">
             <p:panel id="display1" rendered="#{resolucionController.selected != null}">
-                    <h:panelGrid columns="3" >                        
+                <h:panelGrid columns="3" >                        
                         
                         <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_resNumero}"/>
                         <p:inputText id="resNumero" value="#{resolucionController.selected.resNumero}" 
                                      title="#{bundleResolucion.CreateResolucionTitle_resNumero}" />
                         <p:outputLabel value=""/>                        
+                        
+                        <p:outputLabel value="Fecha: "/>
+                        <p:calendar  id="event" value="#{resolucionController.pub.pubFechaPublicacion}" maxdate="#{currentDay}" size="35" 
+                                 pattern="yyyy-MMM-dd" navigator="true" autocomplete="false" locale="es" required="true">
+                        <p:ajax event="dateSelect" listener="#{publicacionController.onDateSelect}"  />
+                        </p:calendar>
+                        <p:message for="event" id="msjValFechaPublicacion" />
+                        
                         
                         <p:outputLabel value="#{bundleResolucion.CreateResolucionLabel_resDescripcion}"/>
                         <p:inputTextarea value="#{resolucionController.selected.resDescripcion}" rows="5" cols="50" counter="desc" 
@@ -39,7 +47,9 @@
                         <h:outputText id="desc" />                                                
                         
                         <p:outputLabel value="Palabra Clave :" styleClass="addEspacio"/>
-                        <p:inputText  id="valKW"  value="#{resolucionController.keyword.palClapalabra}"  size="35"/>
+                        <p:inputText  id="valKW"  value="#{resolucionController.keyword.palClapalabra}"  placeholder="Ingrese las palabras clave" size="35"> 
+                            <p:ajax event="blur"/> 
+                        </p:inputText>
                         <p:commandButton id="agregarPalabra" icon="ui-icon-plus">
                             <p:ajax event="click" listener="#{resolucionController.agregarPalabra()}" update="valKW, tablaPalabras"/>
                         </p:commandButton>
@@ -57,21 +67,22 @@
                             </p:column>                                                            
                         </p:dataTable>  
                         <p:outputLabel value="" styleClass="addEspacio"/> 
+                        
                         <h:panelGroup>
-                            <p:outputLabel value="Archivo: " styleClass="addEspacio"/>
+                            <p:outputLabel value="Resolución: " styleClass="addEspacio"/>
                             <p:outputLabel style="font-style: italic; font-size: 16px; text-align: left; color: red;"  value="*" />&nbsp;
                         </h:panelGroup>
                         <p:fileUpload id="archivo"   value="#{resolucionController.documento}" required="true" mode="simple" allowTypes="/(\.|\/)(pdf)$/" styleClass="addEspacio"/>                        
                         <p:messages for="valTContenido"  id="msjvalTContenido" />
                         <h:outputText value=""/>
 
-
-                    </h:panelGrid>
+                </h:panelGrid>
                 
                 <h:form>
                     <h:panelGrid columns="2" cellspacing="10>">
-                        <h:commandButton value="#{bundleResolucion.Save}" actionListener="#{resolucionController.AgregarResolucion(userLoginView.username)}" class="btn btn-primary"/> 
-                        <h:commandButton value="Cancelar" onclick="if (!confirm('¿Desea cancelar el registro del documento?')) {
+                        <p:commandButton value="#{bundleResolucion.Save}" actionListener="#{resolucionController.AgregarResolucion()}" class="btn btn-primary"
+                                         update="ResolucionCreateForm" ajax="false"/> 
+                        <p:commandButton value="Cancelar" onclick="if (!confirm('¿Desea cancelar el registro del documento?')) {
                                 return false;
                             }
                             ;
@@ -79,9 +90,6 @@
                     </h:panelGrid>
                 </h:form>
                 
-
-                    <p:commandButton actionListener="#{resolucionController.create}" value="#{bundleResolucion.Save}" update="ResolucionCreateForm"/>
-                    <p:commandButton value="#{bundleResolucion.Cancel}"/>
                 </p:panel>
             </h:form>
 

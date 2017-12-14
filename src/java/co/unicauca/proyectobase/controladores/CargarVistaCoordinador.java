@@ -144,7 +144,7 @@ public class CargarVistaCoordinador implements Serializable
      */
     public void registrarDocumento()
     {        
-        this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/gestionDocumentos/RegistrarActa.xhtml";        
+        this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/gestionDocumentos/RegistrarDocumento.xhtml";        
     }
     
     /**
@@ -154,5 +154,11 @@ public class CargarVistaCoordinador implements Serializable
     {        
         this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/gestionDocumentos/RegistrarResolucion.xhtml";        
     }
-    
+    /**
+     * Ruta hacia la lista de documentos
+     */
+    public void ListarDocumentacion()
+    {        
+        this.ruta = "/ProyectoII/faces/usuariosdelsistema/coordinador/gestionDocumentos/ListarDocumentacion.xhtml";        
+    }
 }

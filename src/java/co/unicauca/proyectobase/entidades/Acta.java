@@ -42,13 +42,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Acta.findByActFormato", query = "SELECT a FROM Acta a WHERE a.actFormato = :actFormato")})
 public class Acta implements Serializable {
 
-    @Size(max = 200)
-    @Column(name = "act_nombre")
-    private String actNombre;
-    @Column(name = "act_fecha")
-    @Temporal(TemporalType.DATE)
-    private Date actFecha;
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,10 +68,17 @@ public class Acta implements Serializable {
     @Size(max = 65)
     @Column(name = "act_formato")
     private String actFormato;
+    @Size(max = 200)
+    @Column(name = "act_nombre")
+    private String actNombre;
+    @Column(name = "act_fecha")
+    @Temporal(TemporalType.DATE)
+    private Date actFecha;
     @JoinColumn(name = "act_identificador", referencedColumnName = "pub_identificador", insertable = false, updatable = false)
     @OneToOne(optional = false)
     private Publicacion publicacion;
-
+    
+    /* Constructores */
     public Acta() {
     }
 
@@ -90,7 +90,8 @@ public class Acta implements Serializable {
         this.actIdentificador = actIdentificador;
         this.actNoActa = actNoActa;
     }
-
+    //<editor-fold defaultstate="collapsed" desc="Getters y Setters">
+    
     public Integer getActIdentificador() {
         return actIdentificador;
     }
@@ -154,7 +155,25 @@ public class Acta implements Serializable {
     public void setPublicacion(Publicacion publicacion) {
         this.publicacion = publicacion;
     }
+    public String getActNombre() {
+        return actNombre;
+    }
 
+    public void setActNombre(String actNombre) {
+        this.actNombre = actNombre;
+    }
+
+    public Date getActFecha() {
+        return actFecha;
+    }
+
+    public void setActFecha(Date actFecha) {
+        this.actFecha = actFecha;
+    }
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Hash y Equals">
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -174,26 +193,11 @@ public class Acta implements Serializable {
         }
         return true;
     }
-
+    //</editor-fold> 
+    
     @Override
     public String toString() {
         return "co.unicauca.proyectobase.entidades.Acta[ actIdentificador=" + actIdentificador + " ]";
-    }
-
-    public String getActNombre() {
-        return actNombre;
-    }
-
-    public void setActNombre(String actNombre) {
-        this.actNombre = actNombre;
-    }
-
-    public Date getActFecha() {
-        return actFecha;
-    }
-
-    public void setActFecha(Date actFecha) {
-        this.actFecha = actFecha;
     }
     
 }

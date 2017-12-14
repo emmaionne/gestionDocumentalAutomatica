@@ -86,8 +86,7 @@
         <role-name>Estudiante</role-name>
     </security-role>
     <security-role>
-        <description>Usuario Coordinador
-        </description>
+        <description>Usuario Coordinador</description>
         <role-name>Coordinador</role-name>
     </security-role>
 </web-app>

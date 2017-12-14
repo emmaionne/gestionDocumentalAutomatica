@@ -83,9 +83,10 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
     public int getnumFilasPubRev() {
         try {
             String queryStr;
-            queryStr = "SELECT AUTO_INCREMENT FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'doctorado' AND TABLE_NAME = 'publicacion'";
+            queryStr = "SELECT AUTO_INCREMENT FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'maestria' AND TABLE_NAME = 'publicacion'";
             javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
             List results = query.getResultList();
+            System.out.println(results.get(0));
             int autoIncrement = ((BigInteger) results.get(0)).intValue();
             return autoIncrement;
         } catch (Exception e) {
@@ -98,7 +99,7 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
     public int getIdArchivo() {
         try {
             String queryStr;
-            queryStr = "SELECT AUTO_INCREMENT FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'doctorado' AND TABLE_NAME = 'archivo'";
+            queryStr = "SELECT AUTO_INCREMENT FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'maestria' AND TABLE_NAME = 'archivo'";
             javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
             List results = query.getResultList();
             int autoIncrement = ((BigInteger) results.get(0)).intValue();
@@ -143,7 +144,7 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
 
         String comSimple = "\'";
         String queryStr;
-        queryStr =  "SELECT COUNT(*) FROM doctorado.publicacion WHERE YEAR(doctorado.publicacion.pub_fecha_registro) =" + comSimple + anio + comSimple + "  AND Month(doctorado.publicacion.pub_fecha_registro) = "+ comSimple + mes + comSimple;
+        queryStr =  "SELECT COUNT(*) FROM maestria.publicacion WHERE YEAR(maestria.publicacion.pub_fecha_registro) =" + comSimple + anio + comSimple + "  AND Month(maestria.publicacion.pub_fecha_registro) = "+ comSimple + mes + comSimple;
         
         javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
         List results = query.getResultList();
@@ -156,7 +157,7 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
 
         String comSimple = "\'";
         String queryStr;
-        queryStr =  "SELECT COUNT(*) FROM doctorado.publicacion WHERE YEAR(doctorado.publicacion.pub_fecha_visado) =" + comSimple + anio + comSimple + "  AND Month(doctorado.publicacion.pub_fecha_visado) = "+ comSimple + mes + comSimple;
+        queryStr =  "SELECT COUNT(*) FROM maestria.publicacion WHERE YEAR(maestria.publicacion.pub_fecha_visado) =" + comSimple + anio + comSimple + "  AND Month(maestria.publicacion.pub_fecha_visado) = "+ comSimple + mes + comSimple;
         
         javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
         List results = query.getResultList();
@@ -267,7 +268,14 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
         return findPub;
 
     }      
-              
+    public List<Publicacion> ListadoSoloDocumentos() {
+        
+        javax.persistence.Query query = em.createNamedQuery("Publicacion.findByOnlyDocumentos");
+        List<Publicacion> findPub = query.getResultList();
+        return findPub;
+
+    }      
+           
     public List<Publicacion> ListadoPublicacionEstFilt(int estIdentificador, String variableFiltrado) {
 
         javax.persistence.Query query = em.createNamedQuery("Publicacion.findAllByRev");
@@ -313,7 +321,7 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
 
         String comSimple = "\'";
         String queryStr;
-        queryStr = " SELECT est_identificador FROM doctorado.estudiante WHERE est_usuario = " + comSimple + nombre + comSimple;
+        queryStr = " SELECT est_identificador FROM maestria.estudiante WHERE est_usuario = " + comSimple + nombre + comSimple;
         javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
         List results = query.getResultList();
         int estIden = (int) results.get(0);
@@ -333,7 +341,7 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
 
         String comSimple = "\'";
         String queryStr;
-        queryStr = " SELECT est_identificador FROM doctorado.estudiante WHERE est_usuario = " + comSimple + nombre + comSimple;
+        queryStr = " SELECT est_identificador FROM maestria.estudiante WHERE est_usuario = " + comSimple + nombre + comSimple;
         javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
         List results = query.getResultList();
         int estIden = (int) results.get(0);

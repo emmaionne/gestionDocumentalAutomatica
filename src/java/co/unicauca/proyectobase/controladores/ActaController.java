@@ -24,13 +24,21 @@ import javax.ejb.EJBException;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
+
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 
 @Named("actaController")
+@ManagedBean
 @SessionScoped
 public class ActaController implements Serializable {
 
@@ -50,15 +58,16 @@ public class ActaController implements Serializable {
     private PalabraClave keyword;
     private CargarVistaCoordinador cvc;
     
-    List<Palabra> listaPalabras = new ArrayList<>();
-    String nombre_doc;
-//<editor-fold defaultstate="collapsed" desc="Getters y Setters">
+    String palabra;
+    List<Palabra> listaPalabras = new ArrayList<>();    
     
+    /*Constructor*/
     public ActaController() {
         cvc = new CargarVistaCoordinador();
         pub = new Publicacion();
     }
-
+    
+    //<editor-fold defaultstate="collapsed" desc="Getters y Setters">
     public Acta getSelected() {
         return actual;
     }
@@ -107,16 +116,17 @@ public class ActaController implements Serializable {
         this.pub = pub;
     }
 
-    public String getNombre_doc() {
-        return nombre_doc;
+    public String getPalabra() {
+        return palabra;
     }
 
-    public void setNombre_doc(String nombre_doc) {
-        this.nombre_doc = nombre_doc;
+    public void setPalabra(String palabra) {
+        this.palabra = palabra;
     }
-//</editor-fold>
+    
+    //</editor-fold>
       
-//<editor-fold defaultstate="collapsed" desc="Metodos Controlador">
+    //<editor-fold defaultstate="collapsed" desc="Metodos Controlador">
     
     protected void setEmbeddableKeys() {
     }
@@ -240,87 +250,80 @@ public class ActaController implements Serializable {
         }
 
     }
-//</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="Nuevos Metodos">
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Otros Metodos">
     /**
      * Redireccion registrar acta coordinador
      */
     public void redirigirARegistrarCoor() {
-        this.prepareCreate(); // Inicializar el Objeto
+        // Inicializar el Objeto
+        this.prepareCreate(); 
         listaPalabras.clear();
         keyword = new PalabraClave();
         cvc.registrarDocumento();
         Utilidades.redireccionar(cvc.getRuta());
-    }             
+    }
+        
+    //</editor-fold>
     
-    /**
+    //<editor-fold defaultstate="collapsed" desc="Agregar Acta">
+    
+     /**
      * Agregar un acta a traves de un coordinador
      * @throws java.io.IOException
      */
-    public void AgregarActa() throws IOException{
-        System.out.println("Registrando Acta");
-        // Formato Valido
-        boolean formatoValido = true;
-        /*if (!documento.getFileName().equalsIgnoreCase("") && !"application/pdf".equals(documento.getContentType())) {
+    public void AgregarActa(){
+        System.out.println("Registrando Acta...");
+        String mensaje="";
+        boolean formatoValido=true;
+        if (documento == null && documento.getFileName().equalsIgnoreCase("") && !"application/pdf".equals(documento.getContentType())) {
 
-            FacesContext.getCurrentInstance().addMessage("valPublicacion", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Se debe subir el documento en formato pdf", ""));
+            FacesContext.getCurrentInstance().addMessage(mensaje, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe subir la evidencia de la practica docente en formato PDF", ""));
             formatoValido = false;
-        }*/
-        if (formatoValido == true) {
-            boolean puedeSubir = false;
-            
-            if (documento.getFileName().equalsIgnoreCase("")) {
-                FacesContext.getCurrentInstance().addMessage("Documento Acta", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Debe subir el archivo", ""));             
-            }
-            else 
-                puedeSubir = true; 
-            
+            System.out.println("No existe el archivo");
+        }
+         
+        if (formatoValido) {
+            boolean puedeSubir = true;
             if(puedeSubir){
-                System.out.println("Agregando Acta");
+                System.out.println("Inicio Agregar Acta");
                 try{
                     int numPubRevis = ejbPublicacion.getnumFilasPubRev();
                     pub.setPubIdentificador(numPubRevis);
-                
+                    pub.setPubFechaPublicacion(actual.getActFecha());
                     pub.setPubTipoPublicacion("Acta");
                     actual.setActIdentificador(numPubRevis);
+                    
+                    pub.setActa(actual);
+                    pub.setLibro(null);
+                    pub.setCongreso(null);
+                    pub.setCapituloLibro(null);
+                    pub.setRevista(null);
+                    pub.setResolucion(null);
                     try{
-                        pub.AgregarActa(documento);
+                        puedeSubir = pub.AgregarActa(documento);
                     }
                     catch (IOException ex) {
                         Logger.getLogger(ActaController.class.getName()).log(Level.SEVERE, null, ex);
                         System.out.println("error Agregando acta");
+                    }                    
+                    if(puedeSubir)
+                    {
+                        // Persistencia de Publicacion y Acta
+                        ejbPublicacion.create(pub);
+                        ejbPublicacion.flush();
+                        AgregarPalabraBD();
+                        mensajeconfirmarRegistro();
+                        redirigirAlistar();
                     }
-                    //almacenar el objeto en la base de datos
-                    pub.setPubFechaPublicacion(actual.getActFecha());
-                    ejbPublicacion.create(pub);
-                    ejbPublicacion.flush();                    
-                    ejbFacade.create(this.actual);
-                    int numPal = ejbPalabra.getnumFilas();
-                    keyword.setPubIdentificador(pub);
-                    if(!listaPalabras.isEmpty()){
-                        for(int i=0;i<listaPalabras.size();i++){
-                            keyword.setPalClaidentificador(numPal+i);
-                            keyword.setPalClapalabra(listaPalabras.get(i).getWord());
-                            ejbPalabra.create(keyword);
-                        }
-                    }
-                    else{
-                        keyword.setPalClaidentificador(numPal);
-                        ejbPalabra.create(keyword);
-                    }
-                   
-                    mensajeconfirmarRegistro();
-                    redirigirAlistar(); 
                 }
                 catch(EJBException ex)
                 {
                     System.out.println("Error: No se pudo registrar el acta error: " + ex.getMessage());
                 }
             }
-
         }
-
     }
     
     public void mensajeconfirmarRegistro() {
@@ -328,20 +331,20 @@ public class ActaController implements Serializable {
     }
     public void redirigirAlistar() 
     {                
-        cvc.listarEstudiantes();
+        cvc.registrarDocumento();
         Utilidades.redireccionar(cvc.getRuta());
     }
+    //</editor-fold>
     
-    /**
-     * 
-     */
+    //<editor-fold defaultstate="collapsed" desc="Metodos Agregar Palabra Clave">
+
     public void agregarPalabra(){
-        System.out.print("adicionando palabra "+keyword.getPalClapalabra());
+        System.out.print("adicionando palabra "+ keyword.getPalClapalabra());
         if(!keyword.getPalClapalabra().equals("")){
             if(!listaPalabras.contains(new Palabra(keyword.getPalClapalabra())))
             {
                 listaPalabras.add(new Palabra(keyword.getPalClapalabra()));
-                System.out.println("Palabra adicionada" + keyword.getPalClapalabra());
+                System.out.println("Palabra adicionada " + keyword.getPalClapalabra());
             }                        
         }
         else{
@@ -362,11 +365,27 @@ public class ActaController implements Serializable {
         mostrarLista();
     }
     public void mostrarLista(){
-        System.out.println("mostrando lista....");
+        System.out.println("Mostrando lista....");
         for (Palabra lis : listaPalabras) {
             System.out.print(lis.getWord()+ "     ");
         }
-    }   
+    }
+    public void AgregarPalabraBD()
+    {
+	int numPal = ejbPalabra.getnumFilas();
+        keyword.setPubIdentificador(pub);
+        if(!listaPalabras.isEmpty()){
+	    for(int i=0;i<listaPalabras.size();i++){
+	        keyword.setPalClaidentificador(numPal+i);
+	        keyword.setPalClapalabra(listaPalabras.get(i).getWord());
+	        ejbPalabra.create(keyword);
+	    }
+        }
+        else{
+            keyword.setPalClaidentificador(numPal);
+            ejbPalabra.create(keyword);
+        }
+    }
+    //</editor-fold>
     
-//</editor-fold>
 }

@@ -27,12 +27,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "CapituloLibro.findByPubIdentificador", query = "SELECT c FROM CapituloLibro c WHERE c.pubIdentificador = :pubIdentificador")
     , @NamedQuery(name = "CapituloLibro.findByCaplibTituloLibro", query = "SELECT c FROM CapituloLibro c WHERE c.caplibTituloLibro = :caplibTituloLibro")
     , @NamedQuery(name = "CapituloLibro.findByCaplibTituloCapitulo", query = "SELECT c FROM CapituloLibro c WHERE c.caplibTituloCapitulo = :caplibTituloCapitulo")})
-public class CapituloLibro implements Serializable {
 
-    @Basic(optional = true)    
-    @Size(max = 30)
-    @Column(name = "caplib_isbn")
-    private String caplibIsbn;
+public class CapituloLibro implements Serializable {
 
     // Versión de la base de datos
     private static final long serialVersionUID = 1L;
@@ -54,6 +50,11 @@ public class CapituloLibro implements Serializable {
     @Size(min = 1, max = 80)
     @Column(name = "caplib_titulo_capitulo")
     private String caplibTituloCapitulo;
+    @Basic(optional = true)    
+    @Size(max = 30)
+    @Column(name = "caplib_isbn")
+    private String caplibIsbn;
+
     // Publicación asociada al capítulo de un libro
     @JoinColumn(name = "pub_identificador", referencedColumnName = "pub_identificador", insertable = false, updatable = false)
     @OneToOne(optional = false)

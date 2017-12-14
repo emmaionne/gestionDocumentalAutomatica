@@ -423,7 +423,7 @@ public class PracticaDocenteController implements Serializable {
                 try{                    
                     publicacionEntity.setPubEstIdentificador(est);
                     String nombreAut = est.getEstNombre() + " " + est.getEstApellido();
-                    //gijar el identificador consultando la cantidad de filas
+                    //Fijar el identificador consultando la cantidad de filas
                     int numPubRevis = ejbFacadePub.getnumFilasPubRev();
                     publicacionEntity.setPubIdentificador(numPubRevis);
                     
