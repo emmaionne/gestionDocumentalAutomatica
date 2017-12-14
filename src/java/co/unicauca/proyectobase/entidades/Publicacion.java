@@ -508,7 +508,7 @@ public class Publicacion implements Serializable {
             PdfAWriter writer = PdfAWriter.getInstance(document, new FileOutputStream(
                     subidaArchivos.getRutaArchivo()), PdfAConformanceLevel.PDF_A_1B);
             writer.setTagged();               
-
+            
             document.addHeader("Identificador Publicacion", "" + this.pubIdentificador);
             document.addHeader("tipoPDF_cargar", "" + subidaArchivos.getTipoPDF());
             document.addHeader("Estampa Tiempo", "" + estampaTiempo);

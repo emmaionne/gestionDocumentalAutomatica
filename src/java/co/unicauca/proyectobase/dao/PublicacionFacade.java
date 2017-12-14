@@ -145,7 +145,6 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
         String comSimple = "\'";
         String queryStr;
         queryStr =  "SELECT COUNT(*) FROM maestria.publicacion WHERE YEAR(maestria.publicacion.pub_fecha_registro) =" + comSimple + anio + comSimple + "  AND Month(maestria.publicacion.pub_fecha_registro) = "+ comSimple + mes + comSimple;
-        
         javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
         List results = query.getResultList();
         int numeroPub = ((Long) results.get(0)).intValue();
@@ -158,7 +157,6 @@ public class PublicacionFacade extends AbstractFacade<Publicacion> {
         String comSimple = "\'";
         String queryStr;
         queryStr =  "SELECT COUNT(*) FROM maestria.publicacion WHERE YEAR(maestria.publicacion.pub_fecha_visado) =" + comSimple + anio + comSimple + "  AND Month(maestria.publicacion.pub_fecha_visado) = "+ comSimple + mes + comSimple;
-        
         javax.persistence.Query query = getEntityManager().createNativeQuery(queryStr);
         List results = query.getResultList();
         int numeroPub = ((Long) results.get(0)).intValue();

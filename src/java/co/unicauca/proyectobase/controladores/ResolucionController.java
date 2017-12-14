@@ -323,9 +323,9 @@ public class ResolucionController implements Serializable {
         else{
             //FacesContext.getCurrentInstance().addMessage("msjValAutores", new FacesMessage(FacesMessage.SEVERITY_ERROR, " not a text file", ""));
             System.out.println("palabra repetida");            
-        }
-        keyword.setPalClapalabra("");
+        }        
     }
+    
     public void eliminarPalabra(String word){        
         System.out.print("eliminar palabra: " + word);        
         for (int i = 0; i < listaPalabras.size(); i++) {
